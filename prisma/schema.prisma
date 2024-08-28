@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ChallengeResponse {
+  fullNonce         String @id @db.VarChar(16) 
+  userId            BigInt @db.BigInt // FK for user
+  challengeResponse String @db.VarChar(128) // Challenge response 
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+
+model Session {
+  sessionId     String @id @db.VarChar(16)
+  userId        BigInt @db.BigInt
+  sessionSecret String @db.VarChar(128)
+  tstamp        BigInt @db.BigInt
+  st            Int    @db.Integer
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId], name: "userId_index")
+}
+
+model User {
+  id                 BigInt              @id @default(autoincrement()) @db.BigInt
+  username           String              @unique
+  salt               String
+  saltedPassword     String
+  challengeResponses ChallengeResponse[]
+  sessions           Session[]
+}
+

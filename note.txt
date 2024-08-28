@@ -1,0 +1,11 @@
+npm init
+
+npm install express
+npm install --save-dev typescript @types/node @types/express ts-node nodemon
+npx tsc --init
+npm install dotenv --save
+npm install @prisma/client
+npm install --save-dev prisma typescript ts-node @types/node
+npx prisma init
+npm install swagger-ui-express swagger-jsdoc
+npm install --save-dev @types/swagger-ui-express

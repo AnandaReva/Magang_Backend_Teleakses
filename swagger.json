@@ -1,0 +1,201 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "Authentication API",
+      "version": "1.0.0",
+      "description": "API for handling user authentication and challenge response verification."
+    },
+    "paths": {
+      "/login": {
+        "post": {
+          "summary": "Handle user login request",
+          "description": "Handles the login request by generating a nonce and challenge response.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string",
+                      "description": "Username of the user."
+                    },
+                    "half_nonce": {
+                      "type": "string",
+                      "description": "The first part of the nonce, provided by the client."
+                    }
+                  },
+                  "required": ["username", "half_nonce"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Successful response with full nonce and challenge response.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "full_nonce": {
+                        "type": "string",
+                        "description": "Full nonce generated for the challenge."
+                      },
+                      "challenge_response": {
+                        "type": "string",
+                        "description": "The challenge response generated based on the full nonce."
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid input provided.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "description": "Error message describing the issue."
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "User not found.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "description": "Error message indicating that the user was not found."
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "description": "Error message indicating a server issue."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/verify-challenge": {
+        "post": {
+          "summary": "Verify the challenge response",
+          "description": "Verifies the challenge response provided by the client.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "full_nonce": {
+                      "type": "string",
+                      "description": "Full nonce provided by the client."
+                    },
+                    "challenge_response": {
+                      "type": "string",
+                      "description": "Challenge response provided by the client."
+                    }
+                  },
+                  "required": ["full_nonce", "challenge_response"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Challenge response is valid.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "description": "Success message indicating that the challenge response is valid."
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid challenge response provided.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "description": "Error message indicating that the challenge response is invalid."
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Challenge not found.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "description": "Error message indicating that the challenge was not found."
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "description": "Error message indicating a server issue."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
