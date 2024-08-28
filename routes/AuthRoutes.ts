@@ -15,8 +15,8 @@ router.post('/login', handleLoginRequest);
 
 
 // {
-//   "full_nonce": "nonce_12345678",
-//   "challenge_response": "challenge_response_value"
+//   "full_nonce": "932eweqfwt2b92ax",
+//   "challenge_response": "m3Phj39TE319WbJtcFyu2wA/xKnXvh9Gbhe6a919LVk="
 // }
 
 
