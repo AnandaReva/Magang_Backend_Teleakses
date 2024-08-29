@@ -4,11 +4,25 @@ import crypto from 'crypto';
 
 const prisma = new PrismaClient();
 
-// Function to create HMAC SHA256 hash
+
 function createHMACSHA256Hash(data: string, secretKey: string): string {
-  console.log("execute method: createHMACSHA256Hash" )
-    return crypto.createHmac('sha256', secretKey).update(data).digest('base64');
+
+  console.log("execute method: createHMACSHA256Hash")
+  const HMACSHA256Hash = crypto.createHmac('sha256', secretKey).update(data).digest('base64');
+  console.log("HMACSHA256Hash : ", HMACSHA256Hash)
+  return HMACSHA256Hash;
 }
+function calculateChallengeResponse(fullNonce: string, salted_password: string): string {
+  console.log("execute method: calculateChallengeResponse");
+  const challenge_res = createHMACSHA256Hash(fullNonce, salted_password);
+  console.log("challenge_res = ", challenge_res);
+  return challenge_res;
+}
+// function calculateChallengeResponse(fullNonce: string, salted_password: string): string {
+//   console.log("execute method: calculateChallengeResponse");
+//   return createHMACSHA256Hash(fullNonce, salted_password);
+// }
+
 
 // Generate random alphanumeric string
 function generateRandomString(length: number): string {
@@ -23,10 +37,6 @@ function generateRandomString(length: number): string {
   return result;
 }
 
-function calculateChallengeResponse(fullNonce: string, salted_password: string): string {
-  console.log("execute method: calculateChallengeResponse");
-  return createHMACSHA256Hash(fullNonce, salted_password);
-}
 
 // Generate ISO 8601 timestamp
 function generateTimestamp(): string {
