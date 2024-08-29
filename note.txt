@@ -9,3 +9,14 @@ npm install --save-dev prisma typescript ts-node @types/node
 npx prisma init
 npm install swagger-ui-express swagger-jsdoc
 npm install --save-dev @types/swagger-ui-express
+
+
+npm install
+// migrasi databse
+npx prisma migrate dev
+
+//menghasilkan Prisma Client ORM
+npx prisma generate
+
+
+

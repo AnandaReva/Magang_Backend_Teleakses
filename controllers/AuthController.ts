@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import crypto from "crypto";
-import { timeStamp } from "console";
-
 
 const prisma = new PrismaClient();
 
@@ -20,20 +18,25 @@ function generateRandomString(length: number): string {
 // Simulate challengeResponse calculation
 function calculateChallengeResponse(fullNonce: string, salt: string): string {
   return crypto
-  .createHmac("sha256", salt)
-  .update(fullNonce)
-  .digest("hex");
+    .createHmac("sha256", salt)
+    .update(fullNonce)
+    .digest("hex");
+}
+
+// Generate ISO 8601 timestamp
+function generateTimestamp(): string {
+  return new Date().toISOString();
 }
 
 export async function handleLoginRequest(
   req: Request,
   res: Response
 ): Promise<void> {
-  const timestampInSeconds = Math.floor(Date.now() / 1000);
+  const timestamp = generateTimestamp();
   try {
     const { username, half_nonce } = req.body;
 
-    // Validate each field and determine which ones are missing
+    // Validate each field
     const missingFields = [];
     if (!username) missingFields.push('username');
     if (!half_nonce) missingFields.push('half_nonce');
@@ -43,8 +46,16 @@ export async function handleLoginRequest(
         error: "Invalid input",
         missingFields
       });
-      console.log(' res.status(400).json :Missing fields:', missingFields, 'at timestamp:', timestampInSeconds);
-      
+      console.error(`[${timestamp}] res.status(400).json: { error: "Invalid input", missingFields: ${JSON.stringify(missingFields)} }`);
+      return;
+    }
+
+    if (half_nonce.length != 8) {
+      res.status(400).json({
+        error: "Invalid input",
+        message: "half_nonce must be 8 characters long"
+      });
+      console.error(`[${timestamp}] res.status(400).json: { error: "Invalid input", message: "half_nonce must be 8 characters long" }`);
       return;
     }
 
@@ -58,7 +69,7 @@ export async function handleLoginRequest(
         message: "User not found",
         error: "User not registered in database"
       });
-      console.log("res.status(404).json: User not found, ensure username exists in database:", username, 'at timestamp:', timestampInSeconds);
+      console.error(`[${timestamp}] res.status(404).json: { timeStamp: "${timestamp}", message: "User not found", error: "User not registered in database" }`, { username });
       return;
     }
 
@@ -84,7 +95,7 @@ export async function handleLoginRequest(
       salt: user.salt,
     });
 
-    console.log("Response sent at timestamp: res.json", timestampInSeconds, "with data:", {
+    console.log(`[${timestamp}] Response sent: res.json.status(200):`, {
       full_nonce: fullNonce,
       salt: user.salt,
     });
@@ -93,7 +104,7 @@ export async function handleLoginRequest(
       message: "Internal server error",
       error: e
     });
-    console.error("res.status(500).json: Error handling login request at timestamp:", timestampInSeconds, e, req.body);
+    console.error(`[${timestamp}] res.status(500).json: Error handling login request`, e, req.body);
   }
 }
 
@@ -102,7 +113,7 @@ export async function handleChallengeResponseVerification(
   req: Request,
   res: Response
 ): Promise<void> {
-  const timestampInSeconds = Math.floor(Date.now() / 1000);
+  const timestamp = generateTimestamp();
   try {
     const { full_nonce, challenge_response } = req.body;
 
@@ -111,14 +122,11 @@ export async function handleChallengeResponseVerification(
     if (!challenge_response) missingFields.push('challenge_response');
 
     if (missingFields.length > 0) {
-      // Log the request body for debugging
-      console.log(`Timestamp ${timestampInSeconds}: res.status(400).json - Missing fields:`, missingFields);
-
-      // Send response with missing fields
       res.status(400).json({
         error: "Invalid input",
         missingFields,
       });
+      console.log(`[${timestamp}] res.status(400).json: Missing fields:`, missingFields);
       return;
     }
 
@@ -129,14 +137,11 @@ export async function handleChallengeResponseVerification(
     });
 
     if (!challenge) {
-      // Send response with additional information
-      console.log(`Timestamp ${timestampInSeconds}: res.status(401).json - Challenge not valid: The provided full_nonce did not match any existing challenge.`);
-
       res.status(401).json({
         error: "Challenge not valid",
-        errorCode: "CHALLENGE_NOT_VALID", // Kode error yang jelas
         message: "The challenge provided is not valid. Please ensure that the full_nonce is correct and try again."
       });
+      console.error(`[${timestamp}] res.status(401).json: { error: "Challenge not valid", message: "The challenge provided is not valid. Please ensure that the full_nonce is correct and try again." }`);
       return;
     }
 
@@ -153,50 +158,48 @@ export async function handleChallengeResponseVerification(
         .update(`${full_nonce}${nonce2}`)
         .digest("base64");
 
-      // Save Session to DB
+      console.log(`[${timestamp}] session_id: ${session_id}, nonce2: ${nonce2}, session_secret: ${session_secret}`);
+
       await prisma.session.create({
         data: {
           session_id,
           user_id: challenge.user_id,
           session_secret,
-          tstamp: timestampInSeconds,
+          tstamp: Math.floor(Date.now() / 1000),
           st: 1,
         },
       });
 
       const userData = {
-        id: challenge.user.id.toString(), // Convert BigInt to string
-        username: challenge.user.username,
+        id: challenge.user.id.toString(),         
         fullname: challenge.user.fullname,
-        salt: challenge.user.salt
       };
 
       // Send response to frontend
-      console.log(`Timestamp ${timestampInSeconds}: Challenge response is valid - Data:`, {
+      
+      res.status(200).json({
         session_id,
         nonce2,
         userData
       });
-
-      res.status(200).json({
-        message: "Challenge response is valid",
+      console.log(`[${timestamp}] status(200).json: Challenge response is valid:`, {
         session_id,
         nonce2,
         userData
       });
     } else {
-      console.error(`Timestamp ${timestampInSeconds}: Invalid challenge response -`, req.body);
-      res.status(400).json({ 
-        timeStamp: timestampInSeconds,
-        message: "Invalid challenge response" 
+      res.status(400).json({
+        timeStamp: timestamp,
+        message: "Invalid challenge response"
       });
+      console.error(`[${timestamp}] res.status(400).json: { timeStamp: "${timestamp}", message: "Invalid challenge response" }`, req.body);
     }
   } catch (e) {
-    console.error(`Timestamp ${timestampInSeconds}: Error verifying challenge response -`, e, req.body);
-    res.status(500).json({ 
-      timeStamp: timestampInSeconds,
-      error: "Internal server error",
-      e
+    
+    res.status(500).json({
+      timeStamp: timestamp,
+      error: "Internal server error : ", e
     });
+    console.error(`[${timestamp}] Error verifying challenge response: { error: "Internal server error", details: "${e}" }`, req.body);
   }
 }

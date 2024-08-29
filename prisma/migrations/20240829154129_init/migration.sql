@@ -1,37 +1,8 @@
-/*
-  Warnings:
-
-  - You are about to drop the `ChallengeResponse` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Session` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `User` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropForeignKey
-ALTER TABLE "ChallengeResponse" DROP CONSTRAINT "ChallengeResponse_userId_fkey";
-
--- DropForeignKey
-ALTER TABLE "Session" DROP CONSTRAINT "Session_userId_fkey";
-
--- DropTable
-DROP TABLE "ChallengeResponse";
-
--- DropTable
-DROP TABLE "Session";
-
--- DropTable
-DROP TABLE "User";
-
 -- CreateTable
 CREATE TABLE "challenge_response" (
     "full_nonce" VARCHAR(16) NOT NULL,
     "user_id" BIGINT NOT NULL,
-    "challenge_resmagang_teleakses=# select * from "user";
- id | username |     salt     |                         salted_password                          
-----+----------+--------------+------------------------------------------------------------------
-  1 | testuser | passwordsalt | 9cdcff1121b428e3378f4bea7f58b9a76989e2dc0aa3adb038ff7d00132f5726
-(1 row)
-
-ponse" VARCHAR(128) NOT NULL,
+    "challenge_response" VARCHAR(128) NOT NULL,
 
     CONSTRAINT "challenge_response_pkey" PRIMARY KEY ("full_nonce")
 );
@@ -51,6 +22,7 @@ CREATE TABLE "session" (
 CREATE TABLE "user" (
     "id" BIGSERIAL NOT NULL,
     "username" TEXT NOT NULL,
+    "fullname" TEXT NOT NULL,
     "salt" TEXT NOT NULL,
     "salted_password" TEXT NOT NULL,
 

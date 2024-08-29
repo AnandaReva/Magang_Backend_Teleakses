@@ -21,10 +21,10 @@ app.use(express.urlencoded({extended: true}))
 app.get('/', async (req, res) => {
     try {
         await prisma.$connect();
-        res.send('Terhubung ke database');
-    } catch (error) {
-        console.error('Tidak dapat terhubung ke database:', error);
-        res.status(500).send('Tidak dapat terhubung ke database');
+        res.send('Connected to database');
+    } catch (e) {
+        console.error('Cannot connect to database:', e);
+        res.status(500).send('Cannot connect to database',);
     } finally {
         await prisma.$disconnect();
     }
