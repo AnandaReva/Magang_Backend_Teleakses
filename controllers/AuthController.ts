@@ -1,14 +1,18 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
-//import crypto from "crypto";
-import CryptoJS from "crypto-js";
-
+import crypto from 'crypto';
 
 const prisma = new PrismaClient();
 
+// Function to create HMAC SHA256 hash
+function createHMACSHA256Hash(data: string, secretKey: string): string {
+  console.log("execute method: createHMACSHA256Hash" )
+    return crypto.createHmac('sha256', secretKey).update(data).digest('base64');
+}
+
 // Generate random alphanumeric string
 function generateRandomString(length: number): string {
-  console.log("Generating random string");
+  console.log("execute method: generateRandomString");
   const charset = "abcdefghijklmnopqrstuvwxyz0123456789";
   let result = "";
   for (let i = 0; i < length; i++) {
@@ -17,26 +21,11 @@ function generateRandomString(length: number): string {
   }
   console.log("result:", result);
   return result;
-
 }
 
-// // Simulate challengeResponse calculation
-// function calculateChallengeResponse(fullNonce: string, salted_password: string): string {
-//   console.log("calculating challenge response");
-//   return crypto
-  
-//     .createHmac("sha256", salted_password)
-//     .update(fullNonce)
-//     .digest("base64");
-// }
-
 function calculateChallengeResponse(fullNonce: string, salted_password: string): string {
-  console.log("calculating challenge response");
-
-
-  const hmac = CryptoJS.HmacSHA256(fullNonce, salted_password);
-
-  return CryptoJS.enc.Base64.stringify(hmac);
+  console.log("execute method: calculateChallengeResponse");
+  return createHMACSHA256Hash(fullNonce, salted_password);
 }
 
 // Generate ISO 8601 timestamp
@@ -48,6 +37,7 @@ export async function handleLoginRequest(
   req: Request,
   res: Response
 ): Promise<void> {
+  console.log("execute method: handleLoginRequest");
   const timestamp = generateTimestamp();
   try {
     const { username, half_nonce } = req.body;
@@ -57,6 +47,7 @@ export async function handleLoginRequest(
     if (!username) missingFields.push('username');
     if (!half_nonce) missingFields.push('half_nonce');
 
+    console.log("check missing field");
     if (missingFields.length > 0) {
       res.status(400).json({
         error: "Invalid input",
@@ -93,10 +84,10 @@ export async function handleLoginRequest(
     const nonce1 = generateRandomString(8);
     const fullNonce = `${half_nonce}${nonce1}`;
 
-    // Calculate challengeResponse
-    
+    // Calculate challengeResponse using the updated function
     const challengeResponse = calculateChallengeResponse(fullNonce, user.salted_password);
-    console.log("challengeResponse: challengeResponse")
+    console.log("challengeResponse:", challengeResponse);
+    console.log("Send response to frontend");
 
     // Save challenge_response to DB
     await prisma.challenge_response.create({
@@ -106,8 +97,6 @@ export async function handleLoginRequest(
         challenge_response: challengeResponse,
       },
     });
-
-
 
     // Send response to frontend
     res.json({
@@ -133,6 +122,7 @@ export async function handleChallengeResponseVerification(
   req: Request,
   res: Response
 ): Promise<void> {
+  console.log("execute method: handleChallengeResponseVerification");
   const timestamp = generateTimestamp();
   try {
     const { full_nonce, challenge_response } = req.body;
@@ -146,7 +136,7 @@ export async function handleChallengeResponseVerification(
         error: "Invalid input",
         missingFields,
       });
-      console.error(`[${timestamp}] res.status(400).json: Missing fields:`, missingFields , ` \nrequest sent: ${JSON.stringify(req.body)}`);
+      console.error(`[${timestamp}] res.status(400).json: Missing fields:`, missingFields, ` \nrequest sent: ${JSON.stringify(req.body)}`);
       return;
     }
 
@@ -169,17 +159,14 @@ export async function handleChallengeResponseVerification(
     const expectedChallengeResponse = calculateChallengeResponse(full_nonce, challenge.user.salted_password);
     const isValid = expectedChallengeResponse === challenge_response;
 
-      console.log("check challenge response")
+    console.log("check challenge response");
     if (isValid) {
       // Generate session ID and nonce2
       const session_id = generateRandomString(16);
       const nonce2 = generateRandomString(8);
-      const session_secret = CryptoJS.HmacSHA256(
-        `${full_nonce}${nonce2}`,
-        challenge.user.salted_password
-      ).toString(CryptoJS.enc.Base64);
+      const session_secret = createHMACSHA256Hash(`${full_nonce}${nonce2}`, challenge.user.salted_password);
 
-      console.log("challenge response valid")
+      console.log("challenge response valid");
       console.log(`[${timestamp}] ,  Generate session ID and nonce2: 
         session_id: ${session_id}, nonce2: ${nonce2}, session_secret: ${session_secret}`);
 
@@ -194,12 +181,12 @@ export async function handleChallengeResponseVerification(
       });
 
       const userData = {
-        user_id: challenge.user.id.toString(),         
+        user_id: challenge.user.id.toString(),
         fullname: challenge.user.fullname,
       };
 
-      // Send response to frontend
-      
+      console.log(" Send response to frontend");
+
       res.status(200).json({
         session_id,
         nonce2,
@@ -215,14 +202,13 @@ export async function handleChallengeResponseVerification(
         timeStamp: timestamp,
         message: "Invalid challenge response"
       });
-      console.error(`[${timestamp}] res.status(400).json: { timeStamp: "${timestamp}", message: "Invalid challenge response" }`,  ` \nrequest sent: ${JSON.stringify(req.body)}`);
+      console.error(`[${timestamp}] res.status(400).json: { timeStamp: "${timestamp}", message: "Invalid challenge response" }`, ` \nrequest sent: ${JSON.stringify(req.body)}`);
     }
   } catch (e) {
-    
     res.status(500).json({
       timeStamp: timestamp,
       error: "Internal server error : ", e
     });
-    console.error(`[${timestamp}] Error duriing verifying challenge response: { error: "Internal server error", details: "${e}" }`,  ` \nrequest sent: ${JSON.stringify(req.body)}`);
+    console.error(`[${timestamp}] Error during verifying challenge response: { error: "Internal server error", details: "${e}" }`, ` \nrequest sent: ${JSON.stringify(req.body)}`);
   }
 }
