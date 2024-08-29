@@ -1,27 +1,51 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
-import crypto from 'crypto';
-
+//import crypto from 'crypto';
+import { createHmac } from 'crypto';
 const prisma = new PrismaClient();
 
 
 function createHMACSHA256Hash(data: string, secretKey: string): string {
+  console.log("Executing method: createHMACSHA256Hash");
+  console.log(`[ Data: ${data}]`);
+  console.log(`[ Secret Key: ${secretKey}]`);
 
-  console.log("execute method: createHMACSHA256Hash")
-  const HMACSHA256Hash = crypto.createHmac('sha256', secretKey).update(data).digest('base64');
-  console.log("HMACSHA256Hash : ", HMACSHA256Hash)
-  return HMACSHA256Hash;
+  const hmacSHA256Hash = createHmac('sha256', secretKey)
+    .update(data)
+    .digest('base64');
+
+  console.log("[HMAC SHA256 result: ", hmacSHA256Hash, "] \n ----------------");
+  return hmacSHA256Hash;
 }
+
+
 function calculateChallengeResponse(fullNonce: string, salted_password: string): string {
-  console.log("execute method: calculateChallengeResponse");
-  const challenge_res = createHMACSHA256Hash(fullNonce, salted_password);
-  console.log("challenge_res = ", challenge_res);
-  return challenge_res;
+  console.log("Executing method: calculateChallengeResponse");
+  console.log(`[Full Nonce: ${fullNonce}]`);
+  console.log(`[Salted Password: ${salted_password}]`);
+
+  // Calculate the challenge response using HMAC SHA256 hash
+  const challengeResponse = createHMACSHA256Hash(fullNonce, salted_password);
+
+  console.log("[Challenge Response: ", challengeResponse,  "] \n ----------------");
+  return challengeResponse;
 }
-// function calculateChallengeResponse(fullNonce: string, salted_password: string): string {
-//   console.log("execute method: calculateChallengeResponse");
-//   return createHMACSHA256Hash(fullNonce, salted_password);
+
+// function createHMACSHA256Hash(data: string, secretKey: string): string {
+
+//   console.log("execute method: createHMACSHA256Hash", "\n[data: " , data, "secretKey", secretKey , "]" )
+//   const HMACSHA256Hash = crypto.createHmac('sha256', secretKey).update(data).digest('base64');
+//   console.log("HMACSHA256Hash : ", HMACSHA256Hash)
+//   return HMACSHA256Hash;
 // }
+// function calculateChallengeResponse(fullNonce: string, salted_password: string): string {
+//   console.log("execute method: calculateChallengeResponse",  "\n[fullNonce: " , fullNonce ,  "salted_password: " , salted_password , "]");
+
+//   const challenge_res = createHMACSHA256Hash(fullNonce, salted_password);
+//   console.log("challenge_res = ", challenge_res);
+//   return challenge_res;
+// }
+
 
 
 // Generate random alphanumeric string
@@ -209,7 +233,6 @@ export async function handleChallengeResponseVerification(
       });
     } else {
       res.status(400).json({
-        timeStamp: timestamp,
         message: "Invalid challenge response"
       });
       console.error(`[${timestamp}] res.status(400).json: { timeStamp: "${timestamp}", message: "Invalid challenge response" }`, ` \nrequest sent: ${JSON.stringify(req.body)}`);
