@@ -130,8 +130,7 @@ export async function handleChallengeResponseVerification(
 
       const userData = {
         id: challenge.user.id.toString(), // Convert BigInt to string
-        username: challenge.user.username,
-        //fullname: challenge.user.fullname;
+        fullname: challenge.user.fullname
 
       };
 
