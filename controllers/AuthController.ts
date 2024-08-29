@@ -70,9 +70,10 @@ export async function handleLoginRequest(
       full_nonce: fullNonce,
       challenge_response: challengeResponse,
     });
-  } catch (error) {
-    console.error("Error handling login request:", error);
-    res.status(500).json({ error: "Internal server error" });
+  } catch (e) {
+    console.error("Error handling login request:", e, req.body );
+    res.status(500).json({ message:"Internal server error:" , e , reqBody: req.body });
+
   }
 }
 
@@ -232,10 +233,12 @@ export async function handleChallengeResponseVerification(
       });
 
     } else {
-      res.status(400).json({ message: "Invalid challenge response" });
+      console.error("Invalid challenge response", req.body );
+      res.status(400).json({ message: "Invalid challenge response", reqBody: req.body });
+
     }
-  } catch (error) {
-    console.error("Error verifying challenge response:", error);
-    res.status(500).json({ error: "Internal server error" });
+  } catch (e) {
+    console.error("Error verifying challenge response:", e, req.body );
+    res.status(500).json({ error: "Internal server error" , e , reqBody: req.body });
   }
 }
