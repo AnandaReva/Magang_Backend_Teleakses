@@ -15,18 +15,15 @@ function generateRandomString(length: number): string {
   return result;
 }
 
-
-
 // Simulate challengeResponse calculation
 function calculateChallengeResponse(fullNonce: string, salt: string): string {
   return crypto
-  .createHmac("sha256", salt)
-  .update(fullNonce)
-  .digest("hex");
+    .createHmac("sha256", salt)
+    .update(fullNonce)
+    .digest("hex");
 }
 
-
-// Send salt and full_nonce
+// Handle login request: generate and save challenge
 export async function handleLoginRequest(
   req: Request,
   res: Response
@@ -79,7 +76,7 @@ export async function handleLoginRequest(
   }
 }
 
-
+// Handle challenge response verification
 export async function handleChallengeResponseVerification(
   req: Request,
   res: Response
@@ -87,7 +84,6 @@ export async function handleChallengeResponseVerification(
   try {
     const { full_nonce, challenge_response } = req.body;
 
-    // Debugging
     console.log(req.body);
 
     if (!full_nonce || !challenge_response) {
@@ -107,11 +103,8 @@ export async function handleChallengeResponseVerification(
     }
 
     // Verify challenge response
-    const isValid =
-      crypto
-        .createHmac("sha256", challenge.user.salted_password)
-        .update(full_nonce)
-        .digest("base64") === challenge_response;
+    const expectedChallengeResponse = calculateChallengeResponse(full_nonce, challenge.user.salt);
+    const isValid = expectedChallengeResponse === challenge_response;
 
     if (isValid) {
       // Generate session ID and nonce2
@@ -125,21 +118,21 @@ export async function handleChallengeResponseVerification(
       const timestamp = Math.floor(Date.now() / 1000); // Timestamp in seconds
 
       // Save Session to DB
-      const newSession = await prisma.session.create({
+      await prisma.session.create({
         data: {
           session_id,
           user_id: challenge.user_id,
           session_secret,
           tstamp: timestamp,
-          st: 1, 
+          st: 1,
         },
       });
 
       const userData = {
         id: challenge.user.id.toString(), // Convert BigInt to string
         username: challenge.user.username,
-        salt: challenge.user.salt,
-        salted_password: challenge.user.salted_password
+        //fullname: challenge.user.fullname;
+
       };
 
       // Send response to frontend
@@ -149,13 +142,12 @@ export async function handleChallengeResponseVerification(
         nonce2,
         userData,
       });
-
     } else {
       console.error("Invalid challenge response", req.body);
-      res.status(400).json({ message: "Invalid challenge response", reqBody: req.body });
+      res.status(400).json({ message: "Invalid challenge response" });
     }
   } catch (e) {
     console.error("Error verifying challenge response:", e, req.body);
-    res.status(500).json({ error: "Internal server error", e, reqBody: req.body });
+    res.status(500).json({ error: "Internal server error" });
   }
 }

@@ -30,7 +30,8 @@ model session {
 
 model user {
   id                BigInt               @id @default(autoincrement()) @map("id") @db.BigInt
-  username          String               @unique @map("username")
+  username          String               @unique
+  fullname          String?              @map("fullname")
   salt              String               @map("salt")
   salted_password   String               @map("salted_password")
   challenge_responses challenge_response[] 
