@@ -1,26 +1,42 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
-import crypto from "crypto";
+//import crypto from "crypto";
+import CryptoJS from "crypto-js";
+
 
 const prisma = new PrismaClient();
 
 // Generate random alphanumeric string
 function generateRandomString(length: number): string {
+  console.log("Generating random string");
   const charset = "abcdefghijklmnopqrstuvwxyz0123456789";
   let result = "";
   for (let i = 0; i < length; i++) {
     const randomIndex = Math.floor(Math.random() * charset.length);
     result += charset[randomIndex];
   }
+  console.log("result:", result);
   return result;
+
 }
 
-// Simulate challengeResponse calculation
+// // Simulate challengeResponse calculation
+// function calculateChallengeResponse(fullNonce: string, salted_password: string): string {
+//   console.log("calculating challenge response");
+//   return crypto
+  
+//     .createHmac("sha256", salted_password)
+//     .update(fullNonce)
+//     .digest("base64");
+// }
+
 function calculateChallengeResponse(fullNonce: string, salted_password: string): string {
-  return crypto
-    .createHmac("sha256", salted_password)
-    .update(fullNonce)
-    .digest("base64");
+  console.log("calculating challenge response");
+
+
+  const hmac = CryptoJS.HmacSHA256(fullNonce, salted_password);
+
+  return CryptoJS.enc.Base64.stringify(hmac);
 }
 
 // Generate ISO 8601 timestamp
@@ -78,7 +94,9 @@ export async function handleLoginRequest(
     const fullNonce = `${half_nonce}${nonce1}`;
 
     // Calculate challengeResponse
+    
     const challengeResponse = calculateChallengeResponse(fullNonce, user.salted_password);
+    console.log("challengeResponse: challengeResponse")
 
     // Save challenge_response to DB
     await prisma.challenge_response.create({
@@ -88,6 +106,8 @@ export async function handleLoginRequest(
         challenge_response: challengeResponse,
       },
     });
+
+
 
     // Send response to frontend
     res.json({
@@ -149,15 +169,17 @@ export async function handleChallengeResponseVerification(
     const expectedChallengeResponse = calculateChallengeResponse(full_nonce, challenge.user.salted_password);
     const isValid = expectedChallengeResponse === challenge_response;
 
+      console.log("check challenge response")
     if (isValid) {
       // Generate session ID and nonce2
       const session_id = generateRandomString(16);
       const nonce2 = generateRandomString(8);
-      const session_secret = crypto
-        .createHmac("sha256", challenge.user.salted_password)
-        .update(`${full_nonce}${nonce2}`)
-        .digest("base64");
+      const session_secret = CryptoJS.HmacSHA256(
+        `${full_nonce}${nonce2}`,
+        challenge.user.salted_password
+      ).toString(CryptoJS.enc.Base64);
 
+      console.log("challenge response valid")
       console.log(`[${timestamp}] ,  Generate session ID and nonce2: 
         session_id: ${session_id}, nonce2: ${nonce2}, session_secret: ${session_secret}`);
 
