@@ -33,19 +33,28 @@ export async function handleLoginRequest(
 
     console.log(req.body);
 
-    // Validation
-    if (!username || !half_nonce) {
-      res.status(400).json({ error: "Invalid input" });
-      return;
-    }
+  // Validate each field and determine which ones are missing
+  const missingFields = [];
+  if (!username) missingFields.push('username');
+  if (!half_nonce) missingFields.push('half_nonce');
 
+  if (missingFields.length > 0) {
+    console.log('Missing fields:', missingFields);
+    res.status(400).json({ 
+      error: "Invalid input", 
+      missingFields 
+    });
+    
+    return;
+  }
     const user = await prisma.user.findUnique({
       where: { username },
       select: { id: true, salt: true },
     });
 
     if (!user) {
-      res.status(404).json({ error: "User not found" });
+      res.status(404).json({ message: "User not found" , error: "User not registered in database"});
+      console.log("User not found, User not registered in database, ensure username exists in database");
       return;
     }
 
@@ -98,7 +107,8 @@ export async function handleChallengeResponseVerification(
     });
 
     if (!challenge) {
-      res.status(401).json({ error: "Challenge not valid" });
+      res.status(401).json({ message: "Challenge not valid"  });
+      console.log("Challenge not valid")
       return;
     }
 
