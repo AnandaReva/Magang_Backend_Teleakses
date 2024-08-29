@@ -15,6 +15,18 @@ function generateRandomString(length: number): string {
   return result;
 }
 
+
+
+// Simulate challengeResponse calculation
+function calculateChallengeResponse(fullNonce: string, salt: string): string {
+  return crypto
+  .createHmac("sha256", salt)
+  .update(fullNonce)
+  .digest("hex");
+}
+
+
+// Send salt and full_nonce
 export async function handleLoginRequest(
   req: Request,
   res: Response
@@ -32,7 +44,7 @@ export async function handleLoginRequest(
 
     const user = await prisma.user.findUnique({
       where: { username },
-      select: { id: true, salt: true, salted_password: true },
+      select: { id: true, salt: true },
     });
 
     if (!user) {
@@ -44,11 +56,8 @@ export async function handleLoginRequest(
     const nonce1 = generateRandomString(8);
     const fullNonce = `${half_nonce}${nonce1}`;
 
-    // Generate challenge_response
-    const challengeResponse = crypto
-      .createHmac("sha256", user.salted_password)
-      .update(fullNonce)
-      .digest("base64");
+    // Calculate challengeResponse
+    const challengeResponse = calculateChallengeResponse(fullNonce, user.salt);
 
     // Save challenge_response to DB
     await prisma.challenge_response.create({
@@ -62,13 +71,14 @@ export async function handleLoginRequest(
     // Send response to frontend
     res.json({
       full_nonce: fullNonce,
-      challenge_response: challengeResponse,
+      salt: user.salt,
     });
   } catch (e) {
     console.error("Error handling login request:", e, req.body);
-    res.status(500).json({ message: "Internal server error", e, reqBody: req.body });
+    res.status(500).json({ message: "Internal server error" });
   }
 }
+
 
 export async function handleChallengeResponseVerification(
   req: Request,
