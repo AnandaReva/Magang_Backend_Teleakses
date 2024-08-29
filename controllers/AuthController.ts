@@ -171,7 +171,7 @@ export async function handleChallengeResponseVerification(
       });
 
       const userData = {
-        id: challenge.user.id.toString(),         
+        user_id: challenge.user.id.toString(),         
         fullname: challenge.user.fullname,
       };
 
