@@ -16,13 +16,12 @@ function generateRandomString(length: number): string {
 }
 
 // Simulate challengeResponse calculation
-function calculateChallengeResponse(fullNonce: string, salt: string): string {
+function calculateChallengeResponse(fullNonce: string, salted_password: string): string {
   return crypto
-    .createHmac("sha256", salt)
+    .createHmac("sha256", salted_password)
     .update(fullNonce)
     .digest("base64");
 }
-
 
 // Generate ISO 8601 timestamp
 function generateTimestamp(): string {
@@ -62,7 +61,7 @@ export async function handleLoginRequest(
 
     const user = await prisma.user.findUnique({
       where: { username },
-      select: { id: true, salt: true },
+      select: { id: true, salt: true, salted_password: true },
     });
 
     if (!user) {
@@ -79,7 +78,7 @@ export async function handleLoginRequest(
     const fullNonce = `${half_nonce}${nonce1}`;
 
     // Calculate challengeResponse
-    const challengeResponse = calculateChallengeResponse(fullNonce, user.salt);
+    const challengeResponse = calculateChallengeResponse(fullNonce, user.salted_password);
 
     // Save challenge_response to DB
     await prisma.challenge_response.create({
@@ -147,7 +146,7 @@ export async function handleChallengeResponseVerification(
     }
 
     // Verify challenge response
-    const expectedChallengeResponse = calculateChallengeResponse(full_nonce, challenge.user.salt);
+    const expectedChallengeResponse = calculateChallengeResponse(full_nonce, challenge.user.salted_password);
     const isValid = expectedChallengeResponse === challenge_response;
 
     if (isValid) {
