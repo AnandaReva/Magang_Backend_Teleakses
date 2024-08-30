@@ -201,16 +201,19 @@ export async function handleChallengeResponseVerification(
     if (isValid) {
 
 
+      
+      
       // generate session id - 16 random alphanumeric lowercase characters
       const session_id = generateRandomString(16);
       // generate nonce2 = 8 random alphanumeric lowercase characters
       const nonce2 = generateRandomString(8);
       // session secret = hmac-sha256(key=salted password, message = full nonce + nonce2
       const session_secret = createHMACSHA256Hash(`${full_nonce}${nonce2}`, challengeData.user.salted_password);
-
+      
       console.log("challenge response valid");
-      console.log(`  Generate session ID and nonce2:`);
-      console.log(`[ session_id: ${session_id} ]`);
+      console.log("[  Valid Challenge Response: ", expectedChallengeResponse, ']')
+      console.log(`Generate session ID and nonce2:`);
+      console.log(`[  session_id: ${session_id} ]`);
       console.log(`[  nonce2: ${nonce2} ]`);
       console.log(`[  session_secret: ${session_secret}]`);
 
