@@ -13,7 +13,6 @@ function createHMACSHA256Hash(data: string, key: string): string {
   const hmacSHA256Hash = createHmac('sha256', key)
     .update(data)
     .digest('base64');
-
   console.log("[HMAC SHA256 result: ", hmacSHA256Hash, "] \n ----------------");
   return hmacSHA256Hash;
 }
@@ -193,6 +192,10 @@ export async function handleChallengeResponseVerification(
       return;
     }
 
+
+
+
+
     // Verify challenge response
     const expectedChallengeResponse = calculateChallengeResponse(full_nonce, challengeData.user.salted_password);
     const isValid = expectedChallengeResponse === challenge_response;
@@ -201,8 +204,6 @@ export async function handleChallengeResponseVerification(
     if (isValid) {
 
 
-      
-      
       // generate session id - 16 random alphanumeric lowercase characters
       const session_id = generateRandomString(16);
       // generate nonce2 = 8 random alphanumeric lowercase characters
@@ -227,7 +228,7 @@ export async function handleChallengeResponseVerification(
         },
       });
 
-      const userData = {
+      const user_data = {
         user_id: challengeData.user.id.toString(),
         fullname: challengeData.user.fullname,
       };
@@ -237,12 +238,12 @@ export async function handleChallengeResponseVerification(
       res.status(200).json({
         session_id,
         nonce2,
-        userData
+        user_data
       });
       console.log(`[${timestamp}] status(200).json: Challenge response is valid:`, {
         session_id,
         nonce2,
-        userData
+        user_data
       });
     } else {
       res.status(400).json({
