@@ -20,8 +20,9 @@ function calculateChallengeResponse(fullNonce: string, salt: string): string {
   return crypto
     .createHmac("sha256", salt)
     .update(fullNonce)
-    .digest("hex");
+    .digest("base64");
 }
+
 
 // Generate ISO 8601 timestamp
 function generateTimestamp(): string {
