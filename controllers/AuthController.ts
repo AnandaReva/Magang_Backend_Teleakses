@@ -46,7 +46,7 @@ export async function handleLoginRequest(
         error: "Invalid input",
         missingFields
       });
-      console.error(`[${timestamp}] res.status(400).json: { error: "Invalid input", missingFields: ${JSON.stringify(missingFields)} }, \nrequest sent: ${req.body}`);
+      console.error(`[${timestamp}] res.status(400).json: { error: "Invalid input", missingFields: ${JSON.stringify(missingFields)} }, \nrequest sent: ${JSON.stringify(req.body)}`);
       return;
     }
 
@@ -104,7 +104,7 @@ export async function handleLoginRequest(
       message: "Internal server error",
       error: e
     });
-    console.error(`[${timestamp}] res.status(500).json: Error during handling login request`, e, ` \nrequest sent: ${req.body}`);
+    console.error(`[${timestamp}] res.status(500).json: Error during handling login request`, e, ` \nrequest sent: ${JSON.stringify(req.body)}`);
   }
 }
 
@@ -126,7 +126,7 @@ export async function handleChallengeResponseVerification(
         error: "Invalid input",
         missingFields,
       });
-      console.error(`[${timestamp}] res.status(400).json: Missing fields:`, missingFields , ` \nrequest sent: ${req.body}`);
+      console.error(`[${timestamp}] res.status(400).json: Missing fields:`, missingFields , ` \nrequest sent: ${JSON.stringify(req.body)}`);
       return;
     }
 
@@ -141,7 +141,7 @@ export async function handleChallengeResponseVerification(
         error: "Challenge not valid",
         message: "The challenge provided is not valid. Please ensure that the full_nonce is correct and try again."
       });
-      console.error(`[${timestamp}] res.status(401).json: { error: "Challenge not valid", message: "The challenge provided is not valid. Please ensure that the full_nonce is correct." }`, ` \nrequest sent: ${req.body}`);
+      console.error(`[${timestamp}] res.status(401).json: { error: "Challenge not valid", message: "The challenge provided is not valid. Please ensure that the full_nonce is correct." }`, ` \nrequest sent: ${JSON.stringify(req.body)}`);
       return;
     }
 
@@ -193,7 +193,7 @@ export async function handleChallengeResponseVerification(
         timeStamp: timestamp,
         message: "Invalid challenge response"
       });
-      console.error(`[${timestamp}] res.status(400).json: { timeStamp: "${timestamp}", message: "Invalid challenge response" }`,  ` \nrequest sent: ${req.body}`);
+      console.error(`[${timestamp}] res.status(400).json: { timeStamp: "${timestamp}", message: "Invalid challenge response" }`,  ` \nrequest sent: ${JSON.stringify(req.body)}`);
     }
   } catch (e) {
     
@@ -201,6 +201,6 @@ export async function handleChallengeResponseVerification(
       timeStamp: timestamp,
       error: "Internal server error : ", e
     });
-    console.error(`[${timestamp}] Error verifying challenge response: { error: "Internal server error", details: "${e}" }`,  ` \nrequest sent: ${req.body}`);
+    console.error(`[${timestamp}] Error duriing verifying challenge response: { error: "Internal server error", details: "${e}" }`,  ` \nrequest sent: ${JSON.stringify(req.body)}`);
   }
 }
