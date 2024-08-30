@@ -1,20 +1,16 @@
 //routes/AuthRoutes.ts
 import { Router } from 'express';
-import { handleLoginRequest, handleChallengeResponseVerification } from '../controllers/AuthController';
-
+import { handleLoginRequest } from '../controllers/loginController';
+import { handleChallengeResponseVerification } from '../controllers/verifyController';
 
 
 const router = Router();
-
-
 // exp req body 
 //{
 //     "username":"testuser",
 //     "half_nonce":"932eweqf"
 //     }
 router.post('/login', handleLoginRequest);
-
-
 
 // {
 //   "full_nonce": "932eweqfwt2b92ax",

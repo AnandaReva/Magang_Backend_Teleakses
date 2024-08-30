@@ -3,6 +3,7 @@ CREATE TABLE "challenge_response" (
     "full_nonce" VARCHAR(16) NOT NULL,
     "user_id" BIGINT NOT NULL,
     "challenge_response" VARCHAR(128) NOT NULL,
+    "tstamp" BIGINT NOT NULL,
 
     CONSTRAINT "challenge_response_pkey" PRIMARY KEY ("full_nonce")
 );
@@ -12,8 +13,8 @@ CREATE TABLE "session" (
     "session_id" VARCHAR(16) NOT NULL,
     "user_id" BIGINT NOT NULL,
     "session_secret" VARCHAR(128) NOT NULL,
-    "tstamp" BIGINT NOT NULL,
     "st" INTEGER NOT NULL,
+    "tstamp" BIGINT NOT NULL,
 
     CONSTRAINT "session_pkey" PRIMARY KEY ("session_id")
 );
