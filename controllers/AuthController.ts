@@ -5,12 +5,12 @@ import { createHmac } from 'crypto';
 const prisma = new PrismaClient();
 
 
-function createHMACSHA256Hash(data: string, secretKey: string): string {
+function createHMACSHA256Hash(data: string, key: string): string {
   console.log("Executing method: createHMACSHA256Hash");
   console.log(`[ Data: ${data}]`);
-  console.log(`[ Secret Key: ${secretKey}]`);
+  console.log(`[ Key: ${key}]`);
 
-  const hmacSHA256Hash = createHmac('sha256', secretKey)
+  const hmacSHA256Hash = createHmac('sha256', key)
     .update(data)
     .digest('base64');
 
@@ -27,7 +27,7 @@ function calculateChallengeResponse(fullNonce: string, salted_password: string):
   // Calculate the challenge response using HMAC SHA256 hash
   const challengeResponse = createHMACSHA256Hash(fullNonce, salted_password);
 
-  console.log("[Challenge Response: ", challengeResponse,  "] \n ----------------");
+  console.log("[Challenge Response: ", challengeResponse, "] \n ----------------");
   return challengeResponse;
 }
 
@@ -99,7 +99,7 @@ export async function handleLoginRequest(
       console.error(`[${timestamp}] res.status(400).json: { error: "Invalid input", message: "half_nonce must be 8 characters long" }`);
       return;
     }
-
+    //get salt, and salted passsword from db for the username
     const user = await prisma.user.findUnique({
       where: { username },
       select: { id: true, salt: true, salted_password: true },
@@ -115,15 +115,16 @@ export async function handleLoginRequest(
     }
 
     // Generate nonce1
-    const nonce1 = generateRandomString(8);
-    const fullNonce = `${half_nonce}${nonce1}`;
+    const nonce1 = generateRandomString(8); //generate nonce1 (random 8 alphanumeric lowercase characters)
+    const fullNonce = `${half_nonce}${nonce1}`; //full nonce = half nonce + nonce1
+    console.log("[nonce1: ", nonce1, ']')
+    console.log("[fullNonce: ", fullNonce, ']')
 
-    // Calculate challengeResponse using the updated function
+    //challenge_response = hmac-sha256(key=salted password, message = full nonce) in base64
     const challengeResponse = calculateChallengeResponse(fullNonce, user.salted_password);
-    console.log("challengeResponse:", challengeResponse);
-    console.log("Send response to frontend");
 
-    // Save challenge_response to DB
+
+    // Save full_nonce, challenge_response
     await prisma.challenge_response.create({
       data: {
         full_nonce: fullNonce,
@@ -132,6 +133,7 @@ export async function handleLoginRequest(
       },
     });
 
+    console.log("Send response to frontend");
     // Send response to frontend
     res.json({
       full_nonce: fullNonce,
@@ -174,40 +176,48 @@ export async function handleChallengeResponseVerification(
       return;
     }
 
-    // Find the challenge response in DB
-    const challenge = await prisma.challenge_response.findUnique({
+    //verify challenge response
+
+    // Find  challenge response in DB
+    const challengeData = await prisma.challenge_response.findUnique({
       where: { full_nonce },
-      include: { user: true }, // Include user relationship
+      include: { user: true },
     });
 
-    if (!challenge) {
+    if (!challengeData) {
       res.status(401).json({
         error: "Challenge not valid",
-        message: "The challenge provided is not valid. Please ensure that the full_nonce is correct and try again."
+        message: "The challenge provided is not valid. Please ensure that the full_nonce is correct"
       });
       console.error(`[${timestamp}] res.status(401).json: { error: "Challenge not valid", message: "The challenge provided is not valid. Please ensure that the full_nonce is correct." }`, ` \nrequest sent: ${JSON.stringify(req.body)}`);
       return;
     }
 
     // Verify challenge response
-    const expectedChallengeResponse = calculateChallengeResponse(full_nonce, challenge.user.salted_password);
+    const expectedChallengeResponse = calculateChallengeResponse(full_nonce, challengeData.user.salted_password);
     const isValid = expectedChallengeResponse === challenge_response;
-
-    console.log("check challenge response");
+    console.log("expected Challenge Response: ", expectedChallengeResponse)
+    console.log("compared challange rsponse: ", challenge_response, '\n -------------')
     if (isValid) {
-      // Generate session ID and nonce2
+
+
+      // generate session id - 16 random alphanumeric lowercase characters
       const session_id = generateRandomString(16);
+      // generate nonce2 = 8 random alphanumeric lowercase characters
       const nonce2 = generateRandomString(8);
-      const session_secret = createHMACSHA256Hash(`${full_nonce}${nonce2}`, challenge.user.salted_password);
+      // session secret = hmac-sha256(key=salted password, message = full nonce + nonce2
+      const session_secret = createHMACSHA256Hash(`${full_nonce}${nonce2}`, challengeData.user.salted_password);
 
       console.log("challenge response valid");
-      console.log(`[${timestamp}] ,  Generate session ID and nonce2: 
-        session_id: ${session_id}, nonce2: ${nonce2}, session_secret: ${session_secret}`);
+      console.log(`  Generate session ID and nonce2:`);
+      console.log(`[ session_id: ${session_id} ]`);
+      console.log(`[  nonce2: ${nonce2} ]`);
+      console.log(`[  session_secret: ${session_secret}]`);
 
       await prisma.session.create({
         data: {
           session_id,
-          user_id: challenge.user_id,
+          user_id: challengeData.user_id,
           session_secret,
           tstamp: Math.floor(Date.now() / 1000),
           st: 1,
@@ -215,8 +225,8 @@ export async function handleChallengeResponseVerification(
       });
 
       const userData = {
-        user_id: challenge.user.id.toString(),
-        fullname: challenge.user.fullname,
+        user_id: challengeData.user.id.toString(),
+        fullname: challengeData.user.fullname,
       };
 
       console.log(" Send response to frontend");
