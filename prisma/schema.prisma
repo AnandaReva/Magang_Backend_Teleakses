@@ -10,7 +10,7 @@ model challenge_response {
   full_nonce          String  @id @map("full_nonce") @db.VarChar(16)
   user_id             BigInt  @map("user_id") @db.BigInt
   challenge_response  String  @map("challenge_response") @db.VarChar(128)
-
+  tstamp              BigInt  @map("tstamp") @db.BigInt
   user user @relation(fields: [user_id], references: [id])
 
   @@index([user_id])
@@ -20,8 +20,8 @@ model session {
   session_id      String  @id @map("session_id") @db.VarChar(16)
   user_id         BigInt  @map("user_id") @db.BigInt
   session_secret  String  @map("session_secret") @db.VarChar(128)
-  tstamp          BigInt  @map("tstamp") @db.BigInt
   st              Int     @map("st") @db.Integer
+  tstamp          BigInt  @map("tstamp") @db.BigInt
 
   user user @relation(fields: [user_id], references: [id])
 

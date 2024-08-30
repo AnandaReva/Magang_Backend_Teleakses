@@ -2,6 +2,8 @@
 import { Router } from 'express';
 import { handleLoginRequest, handleChallengeResponseVerification } from '../controllers/AuthController';
 
+
+
 const router = Router();
 
 
@@ -19,7 +21,6 @@ router.post('/login', handleLoginRequest);
 //   "challenge_response": "m3Phj39TE319WbJtcFyu2wA/xKnXvh9Gbhe6a919LVk="
 // }
 
-
-router.post('/verify-challenge', handleChallengeResponseVerification);
+router.post('/verify-challenge', handleChallengeResponseVerification, );
 
 export default router;

@@ -10,6 +10,7 @@ import swaggerDocument from './swagger.json';
 
 
 
+
 const prisma = new PrismaClient();
 const app = express()
 app.use(express.json());

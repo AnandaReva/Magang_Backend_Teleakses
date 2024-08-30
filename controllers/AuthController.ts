@@ -4,7 +4,6 @@ import { PrismaClient } from "@prisma/client";
 import { createHmac } from 'crypto';
 const prisma = new PrismaClient();
 
-
 function createHMACSHA256Hash(data: string, key: string): string {
   console.log("Executing method: createHMACSHA256Hash");
   console.log(`[ Data: ${data}]`);
@@ -17,34 +16,17 @@ function createHMACSHA256Hash(data: string, key: string): string {
   return hmacSHA256Hash;
 }
 
-
-function calculateChallengeResponse(fullNonce: string, salted_password: string): string {
+function calculateChallengeResponse(full_nonce: string, salted_password: string): string {
   console.log("Executing method: calculateChallengeResponse");
-  console.log(`[Full Nonce: ${fullNonce}]`);
+  console.log(`[Full Nonce: ${full_nonce}]`);
   console.log(`[Salted Password: ${salted_password}]`);
 
   // Calculate the challenge response using HMAC SHA256 hash
-  const challengeResponse = createHMACSHA256Hash(fullNonce, salted_password);
+  const challengeResponse = createHMACSHA256Hash(full_nonce, salted_password);
 
   console.log("[Challenge Response: ", challengeResponse, "] \n ----------------");
   return challengeResponse;
 }
-
-// function createHMACSHA256Hash(data: string, secretKey: string): string {
-
-//   console.log("execute method: createHMACSHA256Hash", "\n[data: " , data, "secretKey", secretKey , "]" )
-//   const HMACSHA256Hash = crypto.createHmac('sha256', secretKey).update(data).digest('base64');
-//   console.log("HMACSHA256Hash : ", HMACSHA256Hash)
-//   return HMACSHA256Hash;
-// }
-// function calculateChallengeResponse(fullNonce: string, salted_password: string): string {
-//   console.log("execute method: calculateChallengeResponse",  "\n[fullNonce: " , fullNonce ,  "salted_password: " , salted_password , "]");
-
-//   const challenge_res = createHMACSHA256Hash(fullNonce, salted_password);
-//   console.log("challenge_res = ", challenge_res);
-//   return challenge_res;
-// }
-
 
 
 // Generate random alphanumeric string
@@ -66,10 +48,36 @@ function generateTimestamp(): string {
   return new Date().toISOString();
 }
 
+// delete challenge response
+async function deleteChallengeResponse(full_nonce: string): Promise<void> {
+  try {
+    console.log("execute method: deleteChallengeResponse")
+    console.log("fullNonce: " , full_nonce)
+    const existingChallenge = await prisma.challenge_response.findFirst({
+      where: { full_nonce: full_nonce },
+    });
+    if (!existingChallenge) {
+      console.error("Challenge response not found for deletion:", full_nonce);
+      return; 
+    }
+    await prisma.challenge_response.delete({
+      where: { full_nonce: full_nonce },
+    });
+    console.log("[Challenge response deleted:", full_nonce, ']');
+  } catch (error) {
+    console.error("Failed to delete challenge response:", error);
+  }
+}
+
+
 export async function handleLoginRequest(
   req: Request,
   res: Response
 ): Promise<void> {
+
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+  
+  console.log(`API ADDRESS: ${ip}`);
   console.log("execute method: handleLoginRequest");
   const timestamp = generateTimestamp();
   try {
@@ -109,7 +117,7 @@ export async function handleLoginRequest(
         message: "User not found",
         error: "User not registered in database"
       });
-      console.error(`[${timestamp}] res.status(404).json: { timeStamp: "${timestamp}", message: "User not found", error: "User not registered in database" }`, { "username sent:": username });
+      console.error(`[${timestamp}] res.status(401).json: { timeStamp: "${timestamp}", message: "User not found", error: "User not registered in database" }`, { "username sent:": username });
       return;
     }
 
@@ -129,8 +137,10 @@ export async function handleLoginRequest(
         full_nonce: fullNonce,
         user_id: user.id,
         challenge_response: challengeResponse,
+        tstamp: Math.floor(Date.now() / 1000)
       },
     });
+
 
     console.log("Send response to frontend");
     // Send response to frontend
@@ -157,6 +167,10 @@ export async function handleChallengeResponseVerification(
   req: Request,
   res: Response
 ): Promise<void> {
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+  console.log(`API ADDRESS: ${ip}`);
+
+
   console.log("execute method: handleChallengeResponseVerification");
   const timestamp = generateTimestamp();
   try {
@@ -193,8 +207,17 @@ export async function handleChallengeResponseVerification(
     }
 
 
+    const currentTime = BigInt(Math.floor(Date.now() / 1000)); // Current time in s
+    const challengeTimestamp = BigInt(challengeData.tstamp); // BigInt data type
 
-
+    // Check if the timestamp is within the last 60 seconds
+    if (currentTime - challengeTimestamp > BigInt(60)) {
+      res.status(400).json({
+        message: "Challenge has expired"
+      });
+      console.error(`[${timestamp}] res.status(400).json: { message: "Challenge has expired" }`, ` \nrequest sent: ${JSON.stringify(req.body)}`);
+      return;
+    }
 
     // Verify challenge response
     const expectedChallengeResponse = calculateChallengeResponse(full_nonce, challengeData.user.salted_password);
@@ -210,7 +233,7 @@ export async function handleChallengeResponseVerification(
       const nonce2 = generateRandomString(8);
       // session secret = hmac-sha256(key=salted password, message = full nonce + nonce2
       const session_secret = createHMACSHA256Hash(`${full_nonce}${nonce2}`, challengeData.user.salted_password);
-      
+
       console.log("challenge response valid");
       console.log("[  Valid Challenge Response: ", expectedChallengeResponse, ']')
       console.log(`Generate session ID and nonce2:`);
@@ -245,12 +268,18 @@ export async function handleChallengeResponseVerification(
         nonce2,
         user_data
       });
+
+
     } else {
       res.status(400).json({
         message: "Invalid challenge response"
       });
       console.error(`[${timestamp}] res.status(400).json: { timeStamp: "${timestamp}", message: "Invalid challenge response" }`, ` \nrequest sent: ${JSON.stringify(req.body)}`);
     }
+    
+    await deleteChallengeResponse(full_nonce);
+
+
   } catch (e) {
     res.status(500).json({
       timeStamp: timestamp,
