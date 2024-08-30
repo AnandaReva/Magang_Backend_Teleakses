@@ -46,7 +46,7 @@ export async function handleLoginRequest(
         error: "Invalid input",
         missingFields
       });
-      console.error(`[${timestamp}] res.status(400).json: { error: "Invalid input", missingFields: ${JSON.stringify(missingFields)} }`);
+      console.error(`[${timestamp}] res.status(400).json: { error: "Invalid input", missingFields: ${JSON.stringify(missingFields)} }, \nrequest sent: ${req.body}`);
       return;
     }
 
@@ -69,7 +69,7 @@ export async function handleLoginRequest(
         message: "User not found",
         error: "User not registered in database"
       });
-      console.error(`[${timestamp}] res.status(404).json: { timeStamp: "${timestamp}", message: "User not found", error: "User not registered in database" }`, { username });
+      console.error(`[${timestamp}] res.status(404).json: { timeStamp: "${timestamp}", message: "User not found", error: "User not registered in database" }`, { "username sent:": username });
       return;
     }
 
@@ -104,7 +104,7 @@ export async function handleLoginRequest(
       message: "Internal server error",
       error: e
     });
-    console.error(`[${timestamp}] res.status(500).json: Error handling login request`, e, req.body);
+    console.error(`[${timestamp}] res.status(500).json: Error during handling login request`, e, ` \nrequest sent: ${req.body}`);
   }
 }
 
@@ -126,7 +126,7 @@ export async function handleChallengeResponseVerification(
         error: "Invalid input",
         missingFields,
       });
-      console.log(`[${timestamp}] res.status(400).json: Missing fields:`, missingFields);
+      console.error(`[${timestamp}] res.status(400).json: Missing fields:`, missingFields , ` \nrequest sent: ${req.body}`);
       return;
     }
 
@@ -141,7 +141,7 @@ export async function handleChallengeResponseVerification(
         error: "Challenge not valid",
         message: "The challenge provided is not valid. Please ensure that the full_nonce is correct and try again."
       });
-      console.error(`[${timestamp}] res.status(401).json: { error: "Challenge not valid", message: "The challenge provided is not valid. Please ensure that the full_nonce is correct and try again." }`);
+      console.error(`[${timestamp}] res.status(401).json: { error: "Challenge not valid", message: "The challenge provided is not valid. Please ensure that the full_nonce is correct." }`, ` \nrequest sent: ${req.body}`);
       return;
     }
 
@@ -158,7 +158,8 @@ export async function handleChallengeResponseVerification(
         .update(`${full_nonce}${nonce2}`)
         .digest("base64");
 
-      console.log(`[${timestamp}] session_id: ${session_id}, nonce2: ${nonce2}, session_secret: ${session_secret}`);
+      console.log(`[${timestamp}] ,  Generate session ID and nonce2: 
+        session_id: ${session_id}, nonce2: ${nonce2}, session_secret: ${session_secret}`);
 
       await prisma.session.create({
         data: {
@@ -192,7 +193,7 @@ export async function handleChallengeResponseVerification(
         timeStamp: timestamp,
         message: "Invalid challenge response"
       });
-      console.error(`[${timestamp}] res.status(400).json: { timeStamp: "${timestamp}", message: "Invalid challenge response" }`, req.body);
+      console.error(`[${timestamp}] res.status(400).json: { timeStamp: "${timestamp}", message: "Invalid challenge response" }`,  ` \nrequest sent: ${req.body}`);
     }
   } catch (e) {
     
@@ -200,6 +201,6 @@ export async function handleChallengeResponseVerification(
       timeStamp: timestamp,
       error: "Internal server error : ", e
     });
-    console.error(`[${timestamp}] Error verifying challenge response: { error: "Internal server error", details: "${e}" }`, req.body);
+    console.error(`[${timestamp}] Error verifying challenge response: { error: "Internal server error", details: "${e}" }`,  ` \nrequest sent: ${req.body}`);
   }
 }
