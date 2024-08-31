@@ -4,12 +4,15 @@ import authRoutes from './routes/AuthRoutes';
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './swagger.json';
 import checkJsonMiddleware from './middlewares/checkJsonMiddleware'
+import checkIpMiddleware from './middlewares/checkIpMiddleware';
 const prisma = new PrismaClient();
 const app = express();
-// Middleware parsing JSON
+// middlewares
+app.use(checkIpMiddleware);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(checkJsonMiddleware);
+
 
 
 app.get('/', async (req, res) => {

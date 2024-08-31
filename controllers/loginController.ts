@@ -1,61 +1,17 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 //import crypto from 'crypto';
-import { createHmac } from 'crypto';
+import generateTimestamp from "../utils/generateTimeStamp";
+import generateRandomString from "../utils/generateRandomString";
+import createHMACSHA256Hash from "../utils/createHMACSHA256Hash";
+import calculateChallengeResponse from "../utils/calculateChallengeResponse";
 const prisma = new PrismaClient();
-
-function createHMACSHA256Hash(data: string, key: string): string {
-    console.log("Executing method: createHMACSHA256Hash");
-    console.log(`[ Data: ${data}]`);
-    console.log(`[ Key: ${key}]`);
-
-    const hmacSHA256Hash = createHmac('sha256', key)
-        .update(data)
-        .digest('base64');
-    console.log("[HMAC SHA256 result: ", hmacSHA256Hash, "] \n ----------------");
-    return hmacSHA256Hash;
-}
-
-function calculateChallengeResponse(full_nonce: string, salted_password: string): string {
-    console.log("Executing method: calculateChallengeResponse");
-    console.log(`[Full Nonce: ${full_nonce}]`);
-    console.log(`[Salted Password: ${salted_password}]`);
-
-    // Calculate the challenge response using HMAC SHA256 hash
-    const challengeResponse = createHMACSHA256Hash(full_nonce, salted_password);
-
-    console.log("[Challenge Response: ", challengeResponse, "] \n ----------------");
-    return challengeResponse;
-}
-
-
-// Generate random alphanumeric string
-function generateRandomString(length: number): string {
-    console.log("execute method: generateRandomString");
-    const charset = "abcdefghijklmnopqrstuvwxyz0123456789";
-    let result = "";
-    for (let i = 0; i < length; i++) {
-        const randomIndex = Math.floor(Math.random() * charset.length);
-        result += charset[randomIndex];
-    }
-    console.log("result:", result);
-    return result;
-}
-
-// Generate ISO 8601 timestamp
-function generateTimestamp(): string {
-    return new Date().toISOString();
-}
 
 
 export async function handleLoginRequest(
     req: Request,
     res: Response
 ): Promise<void> {
-
-    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
-
-    console.log(`API ADDRESS: ${ip}`);
     console.log("execute method: handleLoginRequest");
     const timestamp = generateTimestamp();
     try {
@@ -91,7 +47,7 @@ export async function handleLoginRequest(
         });
 
         if (!user) {
-            res.status(404).json({
+            res.status(401).json({
                 message: "User not found",
                 error: "User not registered in database"
             });
