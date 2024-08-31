@@ -1,6 +1,7 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import authRoutes from './routes/authRoutes'; 
+import reportRoutes from './routes/reportRoutes'; 
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './swagger.json';
 import checkJsonMiddleware from './middlewares/checkJsonMiddleware'
@@ -29,6 +30,7 @@ app.get('/', async (req, res) => {
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/', authRoutes);
+app.use('/', reportRoutes)
 
 
 const port = 5000;

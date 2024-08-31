@@ -1,0 +1,27 @@
+{
+    "data": {
+        "row_length": 12,
+        "page": 2,
+        "sort_column": 0,
+        "direction": "desc",
+        "bot_id": 123
+    },
+    "from_date": "13-06-2003",
+    "to_date": "14-07-2003",
+    "search_filter": "reva gans",
+    "date_mode": "14-14-2014"
+}
+
+{
+    "data": {
+        "bot_id": 123,
+        "direction": "desc",
+        "page": 2,
+        "row_length": 12,
+        "sort_column": 0
+    },
+    "date_mode": "14-14-2014",
+    "from_date": "13-06-2003",
+    "search_filter": "reva gans",
+    "to_date": "14-07-2003"
+}

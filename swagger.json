@@ -208,7 +208,7 @@
         }
       }
     },
-    "/report/get_bot_conversation_history_table": {
+    "/get_bot_conversation_history_table": {
       "post": {
         "tags": [
           "Bot conversation"
@@ -298,6 +298,389 @@
                     "data": {
                       "type": "object",
                       "description": "Data returned from the bot conversation history table."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Hash not valid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message indicating hash validation failed."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message indicating a server issue or failure to communicate with the backend."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ecwx-session-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Session ID used for tracking the session."
+          },
+          {
+            "name": "ecwx-hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "HMAC-SHA256 hash of the request body using the session secret."
+          }
+        ]
+      }
+    },
+    "/get_bot_executive_summary": {
+      "post": {
+        "tags": [
+          "Bot conversation"
+        ],
+        "summary": "Get Bot Executive Summary",
+        "description": "Handles requests to get the bot executive summary, validates request hash, and forwards to the actual backend endpoint.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "bot_id": {
+                        "type": "string",
+                        "description": "The ID of the bot."
+                      }
+                    },
+                    "required": [
+                      "bot_id"
+                    ]
+                  },
+                  "from_date": {
+                    "type": "number",
+                    "description": "The start date for filtering results."
+                  },
+                  "to_date": {
+                    "type": "number",
+                    "description": "The end date for filtering results."
+                  },
+                  "date_mode": {
+                    "type": "number",
+                    "description": "The date mode for filtering."
+                  }
+                },
+                "required": [
+                  "data",
+                  "from_date",
+                  "to_date",
+                  "date_mode"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with data from the bot executive summary.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message."
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Data returned from the bot executive summary."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Hash not valid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message indicating hash validation failed."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message indicating a server issue or failure to communicate with the backend."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ecwx-session-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Session ID used for tracking the session."
+          },
+          {
+            "name": "ecwx-hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "HMAC-SHA256 hash of the request body using the session secret."
+          }
+        ]
+      }
+    },
+    "/get_bot_conversation_topic_chart": {
+      "post": {
+        "tags": [
+          "Bot conversation"
+        ],
+        "summary": "Get Bot Conversation Topic Chart",
+        "description": "Handles requests to get the bot conversation topic chart, validates request hash, and forwards to the actual backend endpoint.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "bot_id": {
+                        "type": "string",
+                        "description": "The ID of the bot."
+                      }
+                    },
+                    "required": [
+                      "bot_id"
+                    ]
+                  },
+                  "from_date": {
+                    "type": "number",
+                    "description": "The start date for filtering results."
+                  },
+                  "to_date": {
+                    "type": "number",
+                    "description": "The end date for filtering results."
+                  },
+                  "search_filter": {
+                    "type": "string",
+                    "description": "The topic to filter the results by."
+                  },
+                  "date_mode": {
+                    "type": "number",
+                    "description": "The date mode for filtering."
+                  }
+                },
+                "required": [
+                  "data",
+                  "from_date",
+                  "to_date",
+                  "date_mode"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with data from the bot conversation topic chart.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message."
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Data returned from the bot conversation topic chart."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Hash not valid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message indicating hash validation failed."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message indicating a server issue or failure to communicate with the backend."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ecwx-session-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Session ID used for tracking the session."
+          },
+          {
+            "name": "ecwx-hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "HMAC-SHA256 hash of the request body using the session secret."
+          }
+        ]
+      }
+    },
+    "/get_bot_conversation_topic_chart_Duplicate": {
+      "post": {
+        "tags": [
+          "Bot conversation"
+        ],
+        "summary": "Get Bot Conversation Topic Chart",
+        "description": "Handles requests to get the bot conversation topic chart, validates request hash, and forwards to the actual backend endpoint.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "bot_id": {
+                        "type": "string",
+                        "description": "The ID of the bot."
+                      }
+                    },
+                    "required": [
+                      "bot_id"
+                    ]
+                  },
+                  "from_date": {
+                    "type": "number",
+                    "description": "The start date for filtering results."
+                  },
+                  "to_date": {
+                    "type": "number",
+                    "description": "The end date for filtering results."
+                  },
+                  "search_filter": {
+                    "type": "string",
+                    "description": "The topic to filter the results by."
+                  },
+                  "date_mode": {
+                    "type": "number",
+                    "description": "The date mode for filtering."
+                  }
+                },
+                "required": [
+                  "data",
+                  "from_date",
+                  "to_date",
+                  "date_mode"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with data from the bot conversation topic chart.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message."
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Data returned from the bot conversation topic chart."
                     }
                   }
                 }

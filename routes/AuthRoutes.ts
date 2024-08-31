@@ -19,4 +19,4 @@ router.post('/login', handleLoginRequest);
 
 router.post('/verify-challenge', handleChallengeResponseVerification, );
 
-export default router;
+export default router

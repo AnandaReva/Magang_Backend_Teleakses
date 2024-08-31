@@ -5,11 +5,7 @@ import generateTimestamp from "../utils/generateTimeStamp";
 import createHMACSHA256Hash from "../utils/createHMACSHA256Hash";
 import generateRandomString from "../utils/generateRandomString";
 import calculateChallengeResponse from "../utils/calculateChallengeResponse";
-import {GlobalVar } from "../utils/globalvar"
 const prisma = new PrismaClient();
-
-
-
 
 
 
@@ -34,11 +30,6 @@ async function deleteChallengeResponse(full_nonce: string): Promise<void> {
         console.error("Failed to delete challenge response:", error);
     }
 }
-
-
-
-
-
 
 
 // Handle challenge response verification
@@ -109,10 +100,6 @@ export async function handleChallengeResponseVerification(
             const nonce2 = generateRandomString(8);
             // session secret = hmac-sha256(key=salted password, message = full nonce + nonce2
             const session_secret = createHMACSHA256Hash(`${full_nonce}${nonce2}`, challengeData.user.salted_password);
-            //store to global variable
-            GlobalVar.setSessionId(session_id); // Set sessionId, not session_secret
-            GlobalVar.setSessionSecret(session_secret);
-            GlobalVar.setUserId(challengeData.user_id.toString());
 
             console.log("challenge response valid");
             console.log("[Valid Challenge Response: ", expectedChallengeResponse, ']')

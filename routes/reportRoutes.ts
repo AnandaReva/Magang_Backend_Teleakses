@@ -1,8 +1,9 @@
 import { Router } from "express";
 import {
-    getBotConversationHistoryTable,
-    getBotExecutiveSummary,
-    getBotConversationTopicChart,
+  getBotConversationHistoryTable,
+  getBotExecutiveSummary,
+  getBotConversationTopicChart,
+  getBotConversationTopicChartDuplicate
 } from "../controllers/reportController";
 const router = Router();
 
@@ -20,7 +21,7 @@ const router = Router();
     "date_mode": Number(tempFilter.value.date)
 } */
 
-router.get('/get_bot_conversation_history_table', getBotConversationHistoryTable)
+router.post('/get_bot_conversation_history_table', getBotConversationHistoryTable)
 
 
 /* {
@@ -32,9 +33,10 @@ router.get('/get_bot_conversation_history_table', getBotConversationHistoryTable
     "date_mode": Number(tempFilter.value.date)
   }
    */
-router.get('/get_bot_executive_summary', getBotExecutiveSummary)
+router.post('/get_bot_executive_summary', getBotExecutiveSummary)
 
-/* {
+/* 
+{
     "data": {
       "bot_id": queryID.value
     },
@@ -42,9 +44,11 @@ router.get('/get_bot_executive_summary', getBotExecutiveSummary)
     "to_date": Number(dateOfCustom.value.toDate),
     "search_filter": tempFilter.value.topic,
     "date_mode": Number(tempFilter.value.date)
-  } */
+} 
+    
+*/
 
-router.get('/get_bot_conversation_topic_chart', getBotConversationTopicChart)
+router.post('/get_bot_conversation_topic_chart', getBotConversationTopicChart)
 
 /* 
 {
@@ -58,4 +62,7 @@ router.get('/get_bot_conversation_topic_chart', getBotConversationTopicChart)
 }
  */
 
-router.get('/get_bot_conversation_topic_chart ',)
+router.get('/get_bot_conversation_topic_chart_Duplicate ', getBotConversationTopicChartDuplicate)
+
+
+export default router;
