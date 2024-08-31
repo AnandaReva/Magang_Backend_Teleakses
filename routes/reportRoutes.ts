@@ -2,8 +2,7 @@ import { Router } from "express";
 import {
   getBotConversationHistoryTable,
   getBotExecutiveSummary,
-  getBotConversationTopicChart,
-  getBotConversationTopicChartDuplicate
+  getBotConversationTopicChart
 } from "../controllers/reportController";
 const router = Router();
 
@@ -49,20 +48,5 @@ router.post('/get_bot_executive_summary', getBotExecutiveSummary)
 */
 
 router.post('/get_bot_conversation_topic_chart', getBotConversationTopicChart)
-
-/* 
-{
-  "data": {
-    "bot_id": queryID.value
-  },
-  "from_date": Number(dateOfCustom.value.fromDate),
-  "to_date": Number(dateOfCustom.value.toDate),
-  "search_filter": tempFilter.value.topic,
-  "date_mode": Number(tempFilter.value.date)
-}
- */
-
-router.get('/get_bot_conversation_topic_chart_Duplicate ', getBotConversationTopicChartDuplicate)
-
 
 export default router;

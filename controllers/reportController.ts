@@ -156,7 +156,7 @@ export const getBotConversationHistoryTable = async (req: Request, res: Response
         const responseData = await backendResponse.json();
         const realbackendResStatus = backendResponse.status;
         res.status(realbackendResStatus).json(responseData);
-        console.log(`Response real backend: res.status(${realbackendResStatus}).json(${responseData});`,);
+        console.log(`Response real backend: res.status(${realbackendResStatus}).json(${JSON.stringify(responseData)});`,);
 
 
     } catch (e) {
@@ -228,34 +228,3 @@ export const getBotConversationTopicChart = async (req: Request, res: Response) 
 
 
 
-
-
-export const getBotConversationTopicChartDuplicate = async (req: Request, res: Response) => {
-    const timeStamp = generateTimestamp();
-    const isHashValid = await validateRequestHash(req);
-    if (!isHashValid) {
-        res.status(401).json({ error: 'Hash not Valid' });
-        console.error(`[${timeStamp}] Hash not Valid`);
-        return;
-    }
-    console.log('Hash is Valid');
-    try {
-        const backendUrl = "https://chaewon.cayangqu.com/backoffice-helper-api/get_bot_conversation_topic_chart";
-        const backendResponse = await fetch(backendUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'ecwx-session-id': req.headers['ecwx-session-id'] as string,
-                'ecwx-hash': req.headers['ecwx-hash'] as string,
-            },
-            body: JSON.stringify(req.body),
-        });
-        const responseData = await backendResponse.json();
-        const realbackendResStatus = backendResponse.status;
-        res.status(realbackendResStatus).json(responseData);
-        console.log(`Response real backend: res.status(${realbackendResStatus}).json(${responseData});`);
-    } catch (e) {
-        console.error(`[${timeStamp}] Error forwarding request to backend: ${e}`);
-        res.status(500).json({ error: 'Failed to communicate with backend' });
-    }
-}
