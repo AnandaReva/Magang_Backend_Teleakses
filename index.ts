@@ -1,6 +1,6 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import authRoutes from './routes/AuthRoutes';
+import authRoutes from './routes/authRoutes'; 
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './swagger.json';
 import checkJsonMiddleware from './middlewares/checkJsonMiddleware'
