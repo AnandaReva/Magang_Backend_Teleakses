@@ -13,7 +13,7 @@ app.use(checkIpMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
+app.use(checkJsonMiddleware);
 
 app.get('/', async (req, res) => {
     try {
