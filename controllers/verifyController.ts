@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
-//import crypto from 'crypto';
 import generateTimestamp from "../utils/generateTimeStamp";
 import createHMACSHA256Hash from "../utils/createHMACSHA256Hash";
 import generateRandomString from "../utils/generateRandomString";

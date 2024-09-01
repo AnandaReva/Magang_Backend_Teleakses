@@ -208,10 +208,10 @@
         }
       }
     },
-    "/get_bot_conversation_history_table": {
+    "/get-bot-conversation-history-table": {
       "post": {
         "tags": [
-          "Bot conversation"
+          "Bot Conversation"
         ],
         "summary": "Get Bot Conversation History Table",
         "description": "Handles requests to get bot conversation history table, validates request hash, and forwards to the actual backend endpoint.",
@@ -359,10 +359,10 @@
         ]
       }
     },
-    "/get_bot_executive_summary": {
+    "/get-bot-executive-summary": {
       "post": {
         "tags": [
-          "Bot conversation"
+          "Bot Conversation"
         ],
         "summary": "Get Bot Executive Summary",
         "description": "Handles requests to get the bot executive summary, validates request hash, and forwards to the actual backend endpoint.",
@@ -484,10 +484,10 @@
         ]
       }
     },
-    "/get_bot_conversation_topic_chart": {
+    "/get-bot-conversation-topic-chart": {
       "post": {
         "tags": [
-          "Bot conversation"
+          "Bot Conversation"
         ],
         "summary": "Get Bot Conversation Topic Chart",
         "description": "Handles requests to get the bot conversation topic chart, validates request hash, and forwards to the actual backend endpoint.",

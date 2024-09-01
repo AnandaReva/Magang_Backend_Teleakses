@@ -12,8 +12,7 @@ const validateRequestHash = async (req: Request): Promise<boolean> => {
     try {
         const sessionId = req.headers['ecwx-session-id'] as string || '';
         const hashReceived = req.headers['ecwx-hash'] as string || '';
-
-        // Validate missing fields
+        // Validate 
         const missingFields: string[] = [];
         if (!sessionId) missingFields.push('session_id');
         if (!hashReceived) missingFields.push('hash');
@@ -21,7 +20,6 @@ const validateRequestHash = async (req: Request): Promise<boolean> => {
             console.error(`[${timeStamp}] Missing fields: ${missingFields.join(', ')}\nRequest sent: ${JSON.stringify(req.body)}`);
             return false;
         }
-
         console.log("Session ID Received:", sessionId);
         console.log("Hash Received:", hashReceived);
 
@@ -84,7 +82,7 @@ export const getBotConversationHistoryTable = async (req: Request, res: Response
         });
         const responseData = await backendResponse.json();
         const realbackendResStatus = backendResponse.status;
-        res.status(realbackendResStatus).json(JSON.stringify(responseData));
+        res.status(realbackendResStatus).json(responseData);
         console.log(`Response real backend: res.status(${realbackendResStatus}).json(${JSON.stringify(responseData)});`,);
         console.log(`Response sent res.status(${realbackendResStatus}).json(${JSON.stringify(responseData)});`,);
 
@@ -117,7 +115,7 @@ export const getBotExecutiveSummary = async (req: Request, res: Response) => {
         });
         const responseData = await backendResponse.json();
         const realbackendResStatus = backendResponse.status;
-        res.status(realbackendResStatus).json(JSON.stringify(responseData));
+        res.status(realbackendResStatus).json(responseData);
         console.log(`Response real backend: res.status(${realbackendResStatus}).json(${JSON.stringify(responseData)});`,);
         console.log(`Response sent res.status(${realbackendResStatus}).json(${JSON.stringify(responseData)});`,);
     } catch (e) {
@@ -148,7 +146,7 @@ export const getBotConversationTopicChart = async (req: Request, res: Response) 
         });
         const responseData = await backendResponse.json();
         const realbackendResStatus = backendResponse.status;
-        res.status(realbackendResStatus).json(JSON.stringify(responseData));
+        res.status(realbackendResStatus).json(responseData);
         console.log(`Response real backend: res.status(${realbackendResStatus}).json(${JSON.stringify(responseData)});`,);
         console.log(`Response sent res.status(${realbackendResStatus}).json(${JSON.stringify(responseData)});`,);
     } catch (e) {

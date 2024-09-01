@@ -8,7 +8,7 @@ export default function calculateChallengeResponse(full_nonce: string, salted_pa
     // Calculate the challenge response using HMAC SHA256 hash
     const challengeResponse = createHMACSHA256Hash(full_nonce, salted_password);
 
-    console.log("[Challenge Response: ", challengeResponse, "] \n ----------------");
+    console.log("[Challenge Response generated: ", challengeResponse, "] \n ----------------");
     return challengeResponse;
 }
 

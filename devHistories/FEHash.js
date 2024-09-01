@@ -3,31 +3,42 @@ const CryptoJS = require('crypto-js');
 
 const session_secret = 'gOFhhf39yBnWdtBVZc2LAsHnFonLFUaFD92CUhonvrg='; // Replace with your actual secret
 
-
+//api 1
 // const parameters = {
 //     data: {
-//         row_length: 1, 
-//         page: 1,       
+//         row_length: 0,
+//         page: 0,
 //         sort_column: 0,
-//         direction: 'desc',
-//         bot_id: '12345', 
+//         direction: "desc",
+//         bot_id: "string"
 //     },
-//     from_date: 1680355200000, 
-//     to_date: 1682947200000,   
-//     search_filter: 'example_topic', 
-//     date_mode: 1, 
+//     from_date: 0,
+//     to_date: 0,
+//     search_filter: "string",
+//     date_mode: 0
 // };
 
+//api 2
+// const parameters = {
 
+//     data: {
+//         bot_id: "string"
+//     },
+//     from_date: 0,
+//     to_date: 0,
+//     date_mode: 0
+
+// };
+
+//api3
 const parameters = {
-
     data: {
         bot_id: "string"
     },
     from_date: 0,
     to_date: 0,
+    search_filter: "string",
     date_mode: 0
-
 };
 
 
