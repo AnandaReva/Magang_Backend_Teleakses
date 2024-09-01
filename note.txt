@@ -16,6 +16,9 @@ npm install
 // migrasi databse
 npx prisma migrate dev
 
+//update the production database based on your schema
+npx prisma migrate deploy
+
 //menghasilkan Prisma Client ORM
 npx prisma generate
 
