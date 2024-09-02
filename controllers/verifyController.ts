@@ -6,9 +6,6 @@ import generateRandomString from "../utils/generateRandomString";
 import calculateChallengeResponse from "../utils/calculateChallengeResponse";
 const prisma = new PrismaClient();
 
-
-
-
 // delete challenge response
 async function deleteChallengeResponse(full_nonce: string): Promise<void> {
     try {
@@ -29,7 +26,6 @@ async function deleteChallengeResponse(full_nonce: string): Promise<void> {
         console.error("Failed to delete challenge response:", error);
     }
 }
-
 
 // Handle challenge response verification
 export async function handleChallengeResponseVerification(
@@ -53,7 +49,6 @@ export async function handleChallengeResponseVerification(
             console.error(`[${timestamp}] res.status(400).json: Missing fields:`, missingFields, ` \nrequest sent: ${JSON.stringify(req.body)}`);
             return;
         }
-
         //verify challenge response
 
         // Find  challenge response in DB
@@ -70,7 +65,6 @@ export async function handleChallengeResponseVerification(
             console.error(`[${timestamp}] res.status(401).json: { error: "Challenge not valid", message: "The challenge provided is not valid. Please ensure that the full_nonce is correct." }`, ` \nrequest sent: ${JSON.stringify(req.body)}`);
             return;
         }
-
 
         const currentTime = BigInt(Math.floor(Date.now() / 1000)); // Current time in s
         const challengeTimestamp = BigInt(challengeData.tstamp); // BigInt data type
@@ -107,6 +101,7 @@ export async function handleChallengeResponseVerification(
             console.log(`[  nonce2: ${nonce2} ]`);
             console.log(`[  session_secret: ${session_secret}]`);
 
+            console.log("Inserting session data to database");
             await prisma.session.upsert({
                 where: {
                     user_id: challengeData.user_id,
@@ -133,7 +128,6 @@ export async function handleChallengeResponseVerification(
             };
 
             console.log(" Send response to frontend");
-
             res.status(200).json({
                 session_id,
                 nonce2,
