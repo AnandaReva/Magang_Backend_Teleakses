@@ -54,6 +54,7 @@ const validateRequestHash = async (req: Request): Promise<boolean> => {
 
 export const getBotConversationHistoryTable = async (req: Request, res: Response) => {
     const realBackendURL = process.env.endpoint1 ?? '';
+    console.log(`Real Bachend URL: ${realBackendURL}`);
     const timeStamp = generateTimestamp();
 
     // Check if the URL is defined 
@@ -100,6 +101,7 @@ export const getBotConversationHistoryTable = async (req: Request, res: Response
 
 export const getBotExecutiveSummary = async (req: Request, res: Response) => {
     const realBackendURL = process.env.endpoint2 ?? "";
+    console.log(`Real Bachend URL: ${realBackendURL}`);
     const timeStamp = generateTimestamp();
 
     // Check if the URL is defined 
@@ -142,7 +144,7 @@ export const getBotConversationTopicChart = async (req: Request, res: Response) 
 
     const timeStamp = generateTimestamp();
     const realBackendURL = process.env.endpoint3 ?? "";
-    // check if url
+    console.log(`Real Bachend URL: ${realBackendURL}`);
     // Check if the URL is defined 
     if (!realBackendURL) {
         res.status(500).json({ error: 'Backend URL is not defined' });

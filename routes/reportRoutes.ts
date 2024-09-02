@@ -43,8 +43,7 @@ router.post('/get_bot_executive_summary', getBotExecutiveSummary)
     "to_date": Number(dateOfCustom.value.toDate),
     "search_filter": tempFilter.value.topic,
     "date_mode": Number(tempFilter.value.date)
-} 
-    
+}     
 */
 
 router.post('/get_bot_conversation_topic_chart', getBotConversationTopicChart)
