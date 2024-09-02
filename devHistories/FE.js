@@ -1,12 +1,12 @@
-import { HmacSHA256, enc } from 'crypto-js'; 
+import { HmacSHA256, enc } from 'crypto-js';
 
 
-const rowLength = { value: 1 }; 
-const currentPage = { value: 1 }; 
-const queryID = { value: '12345' }; 
+const rowLength = { value: 1 };
+const currentPage = { value: 1 };
+const queryID = { value: '12345' };
 const dateOfCustom = { value: { fromDate: '1680355200000', toDate: '1682947200000' } };
-const tempFilter = { value: { topic: 'example_topic', date: '1' } }; 
-const session_secret = 'gOFhhf39yBnWdtBVZc2LAsHnFonLFUaFD92CUhonvrg=';  
+const tempFilter = { value: { topic: 'example_topic', date: '1' } };
+const session_secret = 'gOFhhf39yBnWdtBVZc2LAsHnFonLFUaFD92CUhonvrg=';
 
 const parameters = {
     data: {

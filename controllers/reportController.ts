@@ -12,6 +12,8 @@ const validateRequestHash = async (req: Request): Promise<boolean> => {
     try {
         const sessionId = req.headers['ecwx-session-id'] as string || '';
         const hashReceived = req.headers['ecwx-hash'] as string || '';
+        console.log("Session ID Received:", sessionId);
+        console.log("Hash Received:", hashReceived);
         // Validate 
         const missingFields: string[] = [];
         if (!sessionId) missingFields.push('session_id');
@@ -20,11 +22,10 @@ const validateRequestHash = async (req: Request): Promise<boolean> => {
             console.error(`[${timeStamp}] Missing fields: ${missingFields.join(', ')}\nRequest sent: ${JSON.stringify(req.body)}`);
             return false;
         }
-        console.log("Session ID Received:", sessionId);
-        console.log("Hash Received:", hashReceived);
 
         const sessionData = await prisma.session.findUnique({ where: { session_id: sessionId } });
         if (!sessionData) {
+            console.error(`Session data with id = [ ${sessionId} ] not found in database \n`)
             return false;
         }
 
@@ -32,11 +33,9 @@ const validateRequestHash = async (req: Request): Promise<boolean> => {
         const postBody = req.body;
 
         const postBodyString = JSON.stringify(postBody);
-        console.log("Post Body String:", postBodyString);
-
-
         const hashExpected = createHMACSHA256Hash(postBodyString, sessionSecret.toString());
-
+        console.log("Session Secret from DB:", sessionSecret);
+        console.log("Post Body String:", postBodyString);
         console.log(`Expected Hash: [${hashExpected}]`);
         console.log(`Received Hash from header: [${hashReceived}]`);
 
@@ -51,24 +50,21 @@ const validateRequestHash = async (req: Request): Promise<boolean> => {
     }
 };
 
-
-
-
 export const getBotConversationHistoryTable = async (req: Request, res: Response) => {
+    const backendUrl = "https://chaewon.cayangqu.com/backoffice-helper-api/get_bot_conversation_history_table";
     const timeStamp = generateTimestamp();
     const isHashValid = await validateRequestHash(req);
     if (!isHashValid) {
         res.status(401).json({
             error: `Hash not Valid`
         });
-        console.error(`[${timeStamp}] Hash not Valid`)
+        console.error(`[${timeStamp}]response sent :  res.status(401).json({error: "Hash not Valid"}); Hash not Valid`);
         return;
     }
     //if hash valid 
-
     console.log('Hash is Valid');
+    console.log(`[${timeStamp} continuing request to real backend url: ${backendUrl}]`);
     try {
-        const backendUrl = "https://chaewon.cayangqu.com/backoffice-helper-api/get_bot_conversation_history_table";
 
         // Send to real backend
         const backendResponse = await fetch(backendUrl, {
@@ -94,16 +90,17 @@ export const getBotConversationHistoryTable = async (req: Request, res: Response
 
 
 export const getBotExecutiveSummary = async (req: Request, res: Response) => {
+    const backendUrl = "https://chaewon.cayangqu.com/backoffice-helper-api/get_bot_executive_summary";
     const timeStamp = generateTimestamp();
     const isHashValid = await validateRequestHash(req);
     if (!isHashValid) {
         res.status(401).json({ error: 'Hash not Valid' });
-        console.error(`[${timeStamp}] Hash not Valid`);
+        console.error(`[${timeStamp}]response sent :  res.status(401).json({error: "Hash not Valid"}); Hash not Valid`);
         return;
     }
     console.log('Hash is Valid');
+    console.log(`[${timeStamp} continuing request to real backend url: ${backendUrl}]`);
     try {
-        const backendUrl = "https://chaewon.cayangqu.com/backoffice-helper-api/get_bot_executive_summary";
         const backendResponse = await fetch(backendUrl, {
             method: 'POST',
             headers: {
@@ -125,16 +122,18 @@ export const getBotExecutiveSummary = async (req: Request, res: Response) => {
 }
 
 export const getBotConversationTopicChart = async (req: Request, res: Response) => {
+
+    const backendUrl = "https://chaewon.cayangqu.com/backoffice-helper-api/get_bot_conversation_topic_chart";
     const timeStamp = generateTimestamp();
     const isHashValid = await validateRequestHash(req);
     if (!isHashValid) {
         res.status(401).json({ error: 'Hash not Valid' });
-        console.error(`[${timeStamp}] Hash not Valid`);
+        console.error(`[${timeStamp}]response sent :  res.status(401).json({error: "Hash not Valid"}); Hash not Valid`);
         return;
     }
     console.log('Hash is Valid');
+    console.log(`[${timeStamp} continuing request to real backend url: ${backendUrl}]`);
     try {
-        const backendUrl = "https://chaewon.cayangqu.com/backoffice-helper-api/get_bot_conversation_topic_chart";
         const backendResponse = await fetch(backendUrl, {
             method: 'POST',
             headers: {

@@ -1,22 +1,22 @@
 const CryptoJS = require('crypto-js');
 
 
-const session_secret = 'gOFhhf39yBnWdtBVZc2LAsHnFonLFUaFD92CUhonvrg='; // Replace with your actual secret
-
+//const session_secret = 'gOFhhf39yBnWdtBVZc2LAsHnFonLFUaFD92CUhonvrg='; 
+const session_secret = 'UISkViro4KmWho1ys33y1YKTdVNfJBXw5fugsnE7Mik='; 
 //api 1
-// const parameters = {
-//     data: {
-//         row_length: 0,
-//         page: 0,
-//         sort_column: 0,
-//         direction: "desc",
-//         bot_id: "string"
-//     },
-//     from_date: 0,
-//     to_date: 0,
-//     search_filter: "string",
-//     date_mode: 0
-// };
+const parameters = {
+    data: {
+        row_length: 0,
+        page: 0,
+        sort_column: 0,
+        direction: "desc",
+        bot_id: "string"
+    },
+    from_date: 0,
+    to_date: 0,
+    search_filter: "string",
+    date_mode: 0
+};
 
 //api 2
 // const parameters = {
@@ -31,15 +31,15 @@ const session_secret = 'gOFhhf39yBnWdtBVZc2LAsHnFonLFUaFD92CUhonvrg='; // Replac
 // };
 
 //api3
-const parameters = {
-    data: {
-        bot_id: "string"
-    },
-    from_date: 0,
-    to_date: 0,
-    search_filter: "string",
-    date_mode: 0
-};
+// const parameters = {
+//     data: {
+//         bot_id: "string"
+//     },
+//     from_date: 0,
+//     to_date: 0,
+//     search_filter: "string",
+//     date_mode: 0
+// };
 
 
 
@@ -68,6 +68,8 @@ function generateHmac(message, key, notif) {
         return null;
     }
 }
+
+
 
 
 console.log("Hashed Body:", hashed_body);
