@@ -10,7 +10,7 @@ const parameters = {
         page: 0,
         sort_column: 0,
         direction: "desc",
-        bot_id: "string"
+        bot_id: 99
     },
     from_date: 0,
     to_date: 0,

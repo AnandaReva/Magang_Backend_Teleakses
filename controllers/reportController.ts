@@ -37,7 +37,7 @@ const validateRequestHash = async (req: Request): Promise<boolean> => {
         const postBodyString = JSON.stringify(postBody);
         const hashExpected = createHMACSHA256Hash(postBodyString, sessionSecret.toString());
         console.log("Session Secret from DB:", sessionSecret);
-        console.log("Post Body String:", postBodyString);
+        console.log("Post Body from FE (stringify):", postBodyString);
         console.log(`Expected Hash: [${hashExpected}]`);
         console.log(`Received Hash from header: [${hashReceived}]`);
 
@@ -158,7 +158,7 @@ export const getBotConversationTopicChart = async (req: Request, res: Response) 
         return;
     }
     console.log('Hash is Valid');
-    console.log(`[${timeStamp} continuing request to real backend url: ${realBackendURL}]`);
+    console.log(`[${timeStamp}] continuing request to real backend url: [${realBackendURL}]`);
     try {
         const backendResponse = await fetch(realBackendURL, {
             method: 'POST',

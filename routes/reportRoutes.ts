@@ -5,7 +5,6 @@ import {
   getBotConversationTopicChart
 } from "../controllers/reportController";
 const router = Router();
-
 /* {
     "data": {
       "row_length": Number(rowLength.value),
@@ -21,8 +20,6 @@ const router = Router();
 } */
 
 router.post('/get_bot_conversation_history_table', getBotConversationHistoryTable)
-
-
 /* {
     "data": {
       "bot_id": queryID.value
@@ -31,9 +28,9 @@ router.post('/get_bot_conversation_history_table', getBotConversationHistoryTabl
     "to_date": Number(dateOfCustom.value.toDate),
     "date_mode": Number(tempFilter.value.date)
   }
-   */
-router.post('/get_bot_executive_summary', getBotExecutiveSummary)
+*/
 
+router.post('/get_bot_executive_summary', getBotExecutiveSummary)
 /* 
 {
     "data": {
