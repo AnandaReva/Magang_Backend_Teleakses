@@ -1,9 +1,11 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from "@prisma/client";
+import dotenv from 'dotenv'
 import generateTimestamp from '../utils/generateTimeStamp'
 import createHMACSHA256Hash from "../utils/createHMACSHA256Hash";
 const prisma = new PrismaClient();
 
+dotenv.config();
 
 
 const validateRequestHash = async (req: Request): Promise<boolean> => {
@@ -51,8 +53,15 @@ const validateRequestHash = async (req: Request): Promise<boolean> => {
 };
 
 export const getBotConversationHistoryTable = async (req: Request, res: Response) => {
-    const backendUrl = "https://chaewon.cayangqu.com/backoffice-helper-api/get_bot_conversation_history_table";
+    const realBackendURL = process.env.endpoint1 ?? '';
     const timeStamp = generateTimestamp();
+
+    // Check if the URL is defined 
+    if (!realBackendURL) {
+        res.status(500).json({ error: 'Backend URL is not defined' });
+        console.error(`[${timeStamp}] Response sent: res.status(500).json({ error: "Backend URL is not defined" }); Backend URL is not defined`);
+        return;
+    }
     const isHashValid = await validateRequestHash(req);
     if (!isHashValid) {
         res.status(401).json({
@@ -63,11 +72,11 @@ export const getBotConversationHistoryTable = async (req: Request, res: Response
     }
     //if hash valid 
     console.log('Hash is Valid');
-    console.log(`[${timeStamp} continuing request to real backend url: ${backendUrl}]`);
+    console.log(`[${timeStamp} continuing request to real backend url: ${realBackendURL}]`);
     try {
 
         // Send to real backend
-        const backendResponse = await fetch(backendUrl, {
+        const backendResponse = await fetch(realBackendURL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -90,8 +99,16 @@ export const getBotConversationHistoryTable = async (req: Request, res: Response
 
 
 export const getBotExecutiveSummary = async (req: Request, res: Response) => {
-    const backendUrl = "https://chaewon.cayangqu.com/backoffice-helper-api/get_bot_executive_summary";
+    const realBackendURL = process.env.endpoint2 ?? "";
     const timeStamp = generateTimestamp();
+
+    // Check if the URL is defined 
+    if (!realBackendURL) {
+        res.status(500).json({ error: 'Backend URL is not defined' });
+        console.error(`[${timeStamp}] Response sent: res.status(500).json({ error: "Backend URL is not defined" }); Backend URL is not defined`);
+        return;
+    }
+
     const isHashValid = await validateRequestHash(req);
     if (!isHashValid) {
         res.status(401).json({ error: 'Hash not Valid' });
@@ -99,9 +116,9 @@ export const getBotExecutiveSummary = async (req: Request, res: Response) => {
         return;
     }
     console.log('Hash is Valid');
-    console.log(`[${timeStamp} continuing request to real backend url: ${backendUrl}]`);
+    console.log(`[${timeStamp} continuing request to real backend url: ${realBackendURL}]`);
     try {
-        const backendResponse = await fetch(backendUrl, {
+        const backendResponse = await fetch(realBackendURL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -123,8 +140,15 @@ export const getBotExecutiveSummary = async (req: Request, res: Response) => {
 
 export const getBotConversationTopicChart = async (req: Request, res: Response) => {
 
-    const backendUrl = "https://chaewon.cayangqu.com/backoffice-helper-api/get_bot_conversation_topic_chart";
     const timeStamp = generateTimestamp();
+    const realBackendURL = process.env.endpoint3 ?? "";
+    // check if url
+    // Check if the URL is defined 
+    if (!realBackendURL) {
+        res.status(500).json({ error: 'Backend URL is not defined' });
+        console.error(`[${timeStamp}] Response sent: res.status(500).json({ error: "Backend URL is not defined" }); Backend URL is not defined`);
+        return;
+    }
     const isHashValid = await validateRequestHash(req);
     if (!isHashValid) {
         res.status(401).json({ error: 'Hash not Valid' });
@@ -132,9 +156,9 @@ export const getBotConversationTopicChart = async (req: Request, res: Response) 
         return;
     }
     console.log('Hash is Valid');
-    console.log(`[${timeStamp} continuing request to real backend url: ${backendUrl}]`);
+    console.log(`[${timeStamp} continuing request to real backend url: ${realBackendURL}]`);
     try {
-        const backendResponse = await fetch(backendUrl, {
+        const backendResponse = await fetch(realBackendURL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

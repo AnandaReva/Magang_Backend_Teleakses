@@ -208,7 +208,7 @@
         }
       }
     },
-    "/get-bot-conversation-history-table": {
+    "/get_bot_conversation_history_table": {
       "post": {
         "tags": [
           "Bot Conversation"
@@ -359,7 +359,7 @@
         ]
       }
     },
-    "/get-bot-executive-summary": {
+    "/get_bot_executive_summary": {
       "post": {
         "tags": [
           "Bot Conversation"
@@ -484,7 +484,7 @@
         ]
       }
     },
-    "/get-bot-conversation-topic-chart": {
+    "/get_bot_conversation_topic_chart": {
       "post": {
         "tags": [
           "Bot Conversation"

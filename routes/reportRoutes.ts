@@ -20,7 +20,7 @@ const router = Router();
     "date_mode": Number(tempFilter.value.date)
 } */
 
-router.post('/get-bot-conversation-history-table', getBotConversationHistoryTable)
+router.post('/get_bot_conversation_history_table', getBotConversationHistoryTable)
 
 
 /* {
@@ -32,7 +32,7 @@ router.post('/get-bot-conversation-history-table', getBotConversationHistoryTabl
     "date_mode": Number(tempFilter.value.date)
   }
    */
-router.post('/get-bot-executive-summary', getBotExecutiveSummary)
+router.post('/get_bot_executive_summary', getBotExecutiveSummary)
 
 /* 
 {
@@ -47,6 +47,6 @@ router.post('/get-bot-executive-summary', getBotExecutiveSummary)
     
 */
 
-router.post('/get-bot-conversation-topic-chart', getBotConversationTopicChart)
+router.post('/get_bot_conversation_topic_chart', getBotConversationTopicChart)
 
 export default router;
