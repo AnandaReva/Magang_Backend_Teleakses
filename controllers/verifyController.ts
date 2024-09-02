@@ -107,15 +107,25 @@ export async function handleChallengeResponseVerification(
             console.log(`[  nonce2: ${nonce2} ]`);
             console.log(`[  session_secret: ${session_secret}]`);
 
-            await prisma.session.create({
-                data: {
-                    session_id,
+            await prisma.session.upsert({
+                where: {
                     user_id: challengeData.user_id,
-                    session_secret,
+                },
+                update: {
+                    session_id: session_id,
+                    session_secret: session_secret,
                     tstamp: Math.floor(Date.now() / 1000),
                     st: 1,
                 },
+                create: {
+                    session_id: session_id,
+                    user_id: challengeData.user_id,
+                    session_secret: session_secret,
+                    tstamp: Math.floor(Date.now() / 1000), 
+                    st: 1, 
+                },
             });
+
 
             const user_data = {
                 user_id: challengeData.user.id.toString(),
@@ -142,7 +152,7 @@ export async function handleChallengeResponseVerification(
             });
             console.error(`[${timestamp}] res.status(400).json: { timeStamp: "${timestamp}", message: "Invalid challenge response" }`, ` \nrequest sent: ${JSON.stringify(req.body)}`);
         }
-        
+
 
         await deleteChallengeResponse(full_nonce);
 

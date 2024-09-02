@@ -8,7 +8,7 @@ datasource db {
 }
 model challenge_response {
   full_nonce          String  @id @map("full_nonce") @db.VarChar(16)
-  user_id             BigInt  @map("user_id") @db.BigInt
+  user_id             BigInt  @map("user_id") @db.BigInt @unique
   challenge_response  String  @map("challenge_response") @db.VarChar(128)
   tstamp              BigInt  @map("tstamp") @db.BigInt
   user user @relation(fields: [user_id], references: [id])
@@ -18,7 +18,7 @@ model challenge_response {
 
 model session {
   session_id      String  @id @map("session_id") @db.VarChar(16)
-  user_id         BigInt  @map("user_id") @db.BigInt
+  user_id         BigInt  @map("user_id") @db.BigInt @unique
   session_secret  String  @map("session_secret") @db.VarChar(128)
   st              Int     @map("st") @db.Integer
   tstamp          BigInt  @map("tstamp") @db.BigInt

@@ -66,15 +66,24 @@ export async function handleLoginRequest(
         const challengeResponse = calculateChallengeResponse(fullNonce, user.salted_password);
 
 
-        // Save full_nonce, challenge_response
-        await prisma.challenge_response.create({
-            data: {
+        // Save full_nonce, challenge_response with upsert 
+        await prisma.challenge_response.upsert({
+            where: {
+                user_id: user.id, 
+            },
+            update: {
+                full_nonce: fullNonce,
+                challenge_response: challengeResponse,
+                tstamp: Math.floor(Date.now() / 1000),
+            },
+            create: {
                 full_nonce: fullNonce,
                 user_id: user.id,
                 challenge_response: challengeResponse,
-                tstamp: Math.floor(Date.now() / 1000)
+                tstamp: Math.floor(Date.now() / 1000),
             },
         });
+
 
 
         console.log("Send response to frontend");
