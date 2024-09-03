@@ -153,7 +153,7 @@ export async function handleChallengeResponseVerification(
 
     } catch (e) {
         res.status(500).json({
-            error: "Internal server error : ", e
+            error: "Internal server error : "
         });
         console.error(`[${timestamp}] Error during verifying challenge response: { error: "Internal server error", details: "${e}" }`, ` \nrequest sent: ${JSON.stringify(req.body)}`);
     }

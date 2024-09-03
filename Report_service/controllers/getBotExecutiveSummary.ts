@@ -44,6 +44,6 @@ export const getBotExecutiveSummary = async (req: Request, res: Response) => {
         console.log(`Response sent res.status(${realbackendResStatus}).json(${JSON.stringify(responseData)});`,);
     } catch (e) {
         console.error(`[${timeStamp}] Error forwarding request to backend: ${e}`);
-        res.status(500).json({ error: 'Failed to communicate with backend' });
+        res.status(500).json({ error_code: 'Failed to communicate with backend' });
     }
 }

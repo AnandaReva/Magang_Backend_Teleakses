@@ -1,6 +1,7 @@
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -21,16 +22,18 @@ model session {
   session_secret  String  @map("session_secret") @db.VarChar(128)
   st              Int     @map("st") @db.Integer
   tstamp          BigInt  @map("tstamp") @db.BigInt
+
   user user @relation(fields: [user_id], references: [id])
+
   @@index([user_id], name: "user_id_index")
 }
 
 model user {
   id                BigInt               @id @default(autoincrement()) @map("id") @db.BigInt
   username          String               @unique
-  fullname          String               @map("fullname")
+  full_name          String               @map("fullname")
   salt              String               @map("salt")
-  salted_password   String               @map("salted_password")
+  saltedpassword   String               @map("salted_password")
   challenge_responses challenge_response[] 
   sessions          session[]           
 }

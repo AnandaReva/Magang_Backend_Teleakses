@@ -113,7 +113,6 @@ export async function handleLoginRequest(
     } catch (e) {
         res.status(500).json({
             message: "Internal server error",
-            error: e
         });
         console.error(`[${timestamp}] res.status(500).json: Error during handling login request`, e, ` \nrequest sent: ${JSON.stringify(req.body)}`);
     }
