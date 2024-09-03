@@ -80,7 +80,7 @@ export async function handleChallengeResponseVerification(
         }
 
         // Verify challenge response
-        const expectedChallengeResponse = calculateChallengeResponse(full_nonce, challengeData.user.salted_password);
+        const expectedChallengeResponse = calculateChallengeResponse(full_nonce, challengeData.user.saltedpassword);
         const isValid = expectedChallengeResponse === challenge_response;
         console.log("expected Challenge Response: ", expectedChallengeResponse)
         console.log("compared challange rsponse: ", challenge_response, '\n -------------')
@@ -92,7 +92,7 @@ export async function handleChallengeResponseVerification(
             // generate nonce2 = 8 random alphanumeric lowercase characters
             const nonce2 = generateRandomString(8);
             // session secret = hmac-sha256(key=salted password, message = full nonce + nonce2
-            const session_secret = createHMACSHA256Hash(`${full_nonce}${nonce2}`, challengeData.user.salted_password);
+            const session_secret = createHMACSHA256Hash(`${full_nonce}${nonce2}`, challengeData.user.saltedpassword);
 
             console.log("challenge response valid");
             console.log("[Valid Challenge Response: ", expectedChallengeResponse, ']')
@@ -124,7 +124,7 @@ export async function handleChallengeResponseVerification(
 
             const user_data = {
                 user_id: challengeData.user.id.toString(),
-                fullname: challengeData.user.fullname,
+                full_name: challengeData.user.full_name,
             };
 
             console.log(" Send response to frontend");

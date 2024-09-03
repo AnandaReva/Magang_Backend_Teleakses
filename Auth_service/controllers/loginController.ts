@@ -42,7 +42,7 @@ export async function handleLoginRequest(
         // Get user data from the database
         const user = await prisma.user.findUnique({
             where: { username },
-            select: { id: true, salt: true, salted_password: true },
+            select: { id: true, salt: true, saltedpassword: true },
         });
 
         if (!user) {
@@ -80,7 +80,7 @@ export async function handleLoginRequest(
         console.log("[fullNonce: ", fullNonce, ']')
 
         
-        const challengeResponse = calculateChallengeResponse(fullNonce, user.salted_password);
+        const challengeResponse = calculateChallengeResponse(fullNonce, user.saltedpassword);
 
         await prisma.challenge_response.upsert({
             where: {
