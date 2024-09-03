@@ -1,0 +1,36 @@
+npm init
+
+npm install express
+npm install --save-dev typescript @types/node @types/express ts-node nodemon
+npx tsc --init
+npm install dotenv --save
+npm install @prisma/client
+npm install --save-dev prisma typescript ts-node @types/node
+npx prisma init
+npm install swagger-ui-express swagger-jsdoc
+npm install --save-dev @types/swagger-ui-express
+npm install connect-timeout
+
+
+npm install
+// migrasi databse
+npx prisma migrate dev
+
+//update the production database based on your schema
+npx prisma migrate deploy
+
+//menghasilkan Prisma Client ORM
+npx prisma generate
+
+
+Instruksi Simulasi Front-End (FE) untuk 3 endpoint baru:
+Generate ecwx-hash:
+
+- Masuk ke folder devHistories: Pindah ke folder di mana file FEHash.js berada.
+- Masukkan session secret dari database: Pastikan  memiliki nilai session secret yg benar dari database. Gunakan nilai ini dalam proses hash.
+- Pilih JSON sesuai endpoint di file FEHash.js: Pilih konfigurasi JSON yang sesuai dengan endpoint yang  gunakan dari file FEHash.js. Perhatikan parameter yang diperlukan.
+- Jalankan perintah node FEHash.js: Eksekusi file FEHash.js dengan perintah ini untuk menghasilkan hash.
+- Masukkan hash yang didapat ke dalam header: Salin hash yang dihasilkan dan masukkan ke dalam header HTTP dengan nama ecwx-hash.
+- Masukkan ecwx-session_id dari database: Pastikan untuk menambahkan ecwx-session_id yang diperoleh dari database ke dalam header atau parameter yang sesuai.
+
+
