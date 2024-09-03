@@ -2,33 +2,33 @@ const CryptoJS = require('crypto-js');
 
 
 //const session_secret = 'gOFhhf39yBnWdtBVZc2LAsHnFonLFUaFD92CUhonvrg='; 
-const session_secret = 'Q/+/mmNniVxv3RBlNFUTOeS+jTDaBuCX+emwwqizqCY='; 
+const session_secret = 'qtCkf3Og/uTzmxfsz9C5FnhLsAoyt5SxjLpzw+9rfkI='; 
 //api 1
-const parameters = {
-    data: {
-        row_length: 0,
-        page: 0,
-        sort_column: 0,
-        direction: "desc",
-        bot_id: 99
-    },
-    from_date: 0,
-    to_date: 0,
-    search_filter: "string",
-    date_mode: 0
-};
-
-//api 2
 // const parameters = {
-
 //     data: {
-//         bot_id: "string"
+//         row_length: 0,
+//         page: 0,
+//         sort_column: 0,
+//         direction: "desc",
+//         bot_id: "59"
 //     },
 //     from_date: 0,
 //     to_date: 0,
+//     search_filter: "string",
 //     date_mode: 0
-
 // };
+
+//api 2
+const parameters = {
+
+    data: {
+        bot_id: "59"
+    },
+    from_date: 0,
+    to_date: 0,
+    date_mode: 0
+
+};
 
 //api3
 // const parameters = {

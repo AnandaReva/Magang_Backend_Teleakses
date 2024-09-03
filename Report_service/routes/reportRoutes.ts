@@ -1,9 +1,7 @@
 import { Router } from "express";
-import {
-  getBotConversationHistoryTable,
-  getBotExecutiveSummary,
-  getBotConversationTopicChart
-} from "../controllers/reportController";
+import { getBotConversationTopicChart } from "../controllers/getBotConversationTopicChart"
+import { getBotConversationHistoryTable } from "../controllers/getBotConversationHistoryTable";
+import { getBotExecutiveSummary } from "../controllers/getBotExecutiveSummary"
 const router = Router();
 /* {
     "data": {
