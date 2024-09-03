@@ -15,7 +15,7 @@ export const getBotConversationHistoryTable = async (req: Request, res: Response
 
     // Check if the URL is defined 
     if (!realBackendURL) {
-        res.status(500).json({ error: 'Backend URL is not defined' });
+        res.status(500).json({ error: 'Internal server error' });
         console.error(`[${timeStamp}] Response sent: res.status(500).json({ error: "Backend URL is not defined" }); Backend URL is not defined`);
         return;
     }

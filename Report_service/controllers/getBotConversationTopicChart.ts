@@ -13,7 +13,7 @@ export const getBotConversationTopicChart = async (req: Request, res: Response) 
     console.log(`Real Bachend URL: ${realBackendURL}`);
     // Check if the URL is defined 
     if (!realBackendURL) {
-        res.status(500).json({ error: 'Backend URL is not defined' });
+        res.status(500).json({ error: 'Internal server error' });
         console.error(`[${timeStamp}] Response sent: res.status(500).json({ error: "Backend URL is not defined" }); Backend URL is not defined`);
         return;
     }
