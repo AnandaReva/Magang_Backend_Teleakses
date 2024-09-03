@@ -25,13 +25,19 @@ CREATE TABLE "user" (
     "username" TEXT NOT NULL,
     "fullname" TEXT NOT NULL,
     "salt" TEXT NOT NULL,
-    "salted_password" TEXT NOT NULL,
+    "saltedpassword" TEXT NOT NULL,
 
     CONSTRAINT "user_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "challenge_response_user_id_key" ON "challenge_response"("user_id");
+
+-- CreateIndex
 CREATE INDEX "challenge_response_user_id_idx" ON "challenge_response"("user_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "session_user_id_key" ON "session"("user_id");
 
 -- CreateIndex
 CREATE INDEX "user_id_index" ON "session"("user_id");

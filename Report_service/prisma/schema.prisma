@@ -33,7 +33,7 @@ model user {
   username          String               @unique
   full_name          String               @map("fullname")
   salt              String               @map("salt")
-  saltedpassword   String               @map("salted_password")
+  saltedpassword   String               @map("saltedpassword")
   challenge_responses challenge_response[] 
   sessions          session[]           
 }
