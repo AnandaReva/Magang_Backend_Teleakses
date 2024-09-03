@@ -1,0 +1,363 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API",
+    "version": "1.0.0",
+    "description": "API for handling backend."
+  },
+  "paths": {
+    "/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Handle user login request",
+        "description": "Handles the login request by generating a nonce and challenge response.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "description": "Username of the user."
+                  },
+                  "half_nonce": {
+                    "type": "string",
+                    "description": "The first part of the nonce, provided by the client."
+                  }
+                },
+                "required": [
+                  "username",
+                  "half_nonce"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with full nonce and challenge response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "full_nonce": {
+                      "type": "string",
+                      "description": "Full nonce generated for the challenge."
+                    },
+                    "challenge_response": {
+                      "type": "string",
+                      "description": "The challenge response generated based on the full nonce."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input provided.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message describing the issue."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message indicating that the user was not found."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message indicating a server issue."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/verify-challenge": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Verify the challenge response",
+        "description": "Verifies the challenge response provided by the client.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "full_nonce": {
+                    "type": "string",
+                    "description": "Full nonce provided by the client."
+                  },
+                  "challenge_response": {
+                    "type": "string",
+                    "description": "Challenge response provided by the client."
+                  }
+                },
+                "required": [
+                  "full_nonce",
+                  "challenge_response"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Challenge response is valid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message indicating that the challenge response is valid."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid challenge response provided.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message indicating that the challenge response is invalid."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Challenge not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message indicating that the challenge was not found."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message indicating a server issue."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/get_bot_conversation_history_table": {
+      "post": {
+        "tags": [
+          "Bot conversation"
+        ],
+        "summary": "Get Bot Conversation History Table",
+        "description": "Handles requests to get bot conversation history table, validates request hash, and forwards to the actual backend endpoint.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "row_length": {
+                        "type": "number",
+                        "description": "The number of rows to be returned."
+                      },
+                      "page": {
+                        "type": "number",
+                        "description": "The current page number for pagination."
+                      },
+                      "sort_column": {
+                        "type": "number",
+                        "description": "The column index to sort by.",
+                        "example": 0
+                      },
+                      "direction": {
+                        "type": "string",
+                        "description": "The sorting direction, e.g., 'asc' or 'desc'.",
+                        "example": "desc"
+                      },
+                      "bot_id": {
+                        "type": "string",
+                        "description": "The ID of the bot."
+                      }
+                    },
+                    "required": [
+                      "row_length",
+                      "page",
+                      "sort_column",
+                      "direction",
+                      "bot_id"
+                    ]
+                  },
+                  "from_date": {
+                    "type": "number",
+                    "description": "The start date for filtering results."
+                  },
+                  "to_date": {
+                    "type": "number",
+                    "description": "The end date for filtering results."
+                  },
+                  "search_filter": {
+                    "type": "string",
+                    "description": "The topic to filter the results by."
+                  },
+                  "date_mode": {
+                    "type": "number",
+                    "description": "The date mode for filtering."
+                  }
+                },
+                "required": [
+                  "data",
+                  "from_date",
+                  "to_date",
+                  "date_mode"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with data from the bot conversation history table.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message."
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Data returned from the bot conversation history table."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Hash not valid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message indicating hash validation failed."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message indicating a server issue or failure to communicate with the backend."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ecwx-session-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Session ID used for tracking the session."
+          },
+          {
+            "name": "ecwx-hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "HMAC-SHA256 hash of the request body using the session secret."
+          }
+        ]
+      }
+    }
+  }
+}
