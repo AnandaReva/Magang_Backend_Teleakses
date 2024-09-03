@@ -32,7 +32,7 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/', reportRoutes)
 
 
-const port = 5001;
+const port = 5000;
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });
