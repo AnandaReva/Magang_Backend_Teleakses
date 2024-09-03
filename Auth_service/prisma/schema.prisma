@@ -1,7 +1,6 @@
 generator client {
   provider = "prisma-client-js"
 }
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -22,9 +21,7 @@ model session {
   session_secret  String  @map("session_secret") @db.VarChar(128)
   st              Int     @map("st") @db.Integer
   tstamp          BigInt  @map("tstamp") @db.BigInt
-
   user user @relation(fields: [user_id], references: [id])
-
   @@index([user_id], name: "user_id_index")
 }
 

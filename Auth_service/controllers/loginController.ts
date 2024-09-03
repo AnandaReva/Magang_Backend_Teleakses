@@ -25,8 +25,7 @@ export async function handleLoginRequest(
         console.log("check missing field");
         if (missingFields.length > 0) {
             res.status(400).json({
-                error: "Invalid input",
-                missingFields
+                error: "Invalid input"
             });
             console.error(`[${timestamp}] res.status(400).json: { error: "Invalid input", missingFields: ${JSON.stringify(missingFields)} }, \nrequest sent: ${JSON.stringify(req.body)}`);
             return;
@@ -34,8 +33,7 @@ export async function handleLoginRequest(
 
         if (half_nonce.length != 8) {
             res.status(400).json({
-                error: "Invalid input",
-                message: "half_nonce must be 8 characters long"
+                error: "Invalid input"
             });
             console.error(`[${timestamp}] res.status(400).json: { error: "Invalid input", message: "half_nonce must be 8 characters long" }`);
             return;
@@ -50,9 +48,8 @@ export async function handleLoginRequest(
         if (!user) {
             res.status(401).json({
                 message: "User not found",
-                error: "User not registered in database"
             });
-            console.error(`[${timestamp}] res.status(401).json: { timeStamp: "${timestamp}", message: "User not found", error: "User not registered in database" }`, { "username sent:": username });
+            console.error(`[${timestamp}] res.status(401).json: { timeStamp: "${timestamp}", message: "User not found" }`, { "username sent:": username });
             return;
         }
 
