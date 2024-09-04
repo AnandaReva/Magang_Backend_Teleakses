@@ -26,13 +26,15 @@ export const getBotExecutiveSummary = async (req: Request, res: Response) => {
 
 
     console.log(`Bot ID received from validateRequestHash: ${botId}`);
-    
-   
-    const userId = req.headers['user-id'] as string || ''; 
-    
+
+
+    const userId = req.headers['user-id'] as string || '';
+
+    console.log("user id from db: ",  userId)
+
     // Log the obtained userId
-    console.log(`User ID received from headers: ${userId}`);
-    
+    console.log(`User ID received from database: ${userId}`);
+
     const isOwner = await checkBotOwnership(botId, userId);
 
     if (!isOwner) {

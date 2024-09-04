@@ -24,9 +24,11 @@ export const getBotConversationTopicChart = async (req: Request, res: Response) 
     
    
     const userId = req.headers['user-id'] as string || ''; 
-    
+    console.log("user id from db: ",  userId)
+
+
     // Log the obtained userId
-    console.log(`User ID received from headers: ${userId}`);
+    console.log(`User ID received from database: ${userId}`);
     
 
     

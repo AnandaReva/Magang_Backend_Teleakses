@@ -30,14 +30,17 @@ export const getBotConversationHistoryTable = async (req: Request, res: Response
     }
 
     console.log(`Bot ID received from validateRequestHash: ${botId}`);
-    
-   
-    const userId = req.headers['user-id'] as string || ''; 
-    
-    // Log the obtained userId
-    console.log(`User ID received from headers: ${userId}`);
 
-    
+
+    const userId = req.headers['user-id'] as string || '';
+
+
+    console.log("user id from db: ",  userId)
+
+    // Log the obtained userId
+    console.log(`User ID received: ${userId}`);
+
+
     const isOwner = await checkBotOwnership(botId, userId);
 
     if (!isOwner) {
@@ -63,7 +66,7 @@ export const getBotConversationHistoryTable = async (req: Request, res: Response
             },
             body: JSON.stringify(req.body),
         });
-        
+
         const responseData = await backendResponse.json();
         const realBackendResStatus = backendResponse.status;
 

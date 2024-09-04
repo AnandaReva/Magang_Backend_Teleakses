@@ -1,14 +1,16 @@
 import pool from '../db/config'; // Pastikan path ke konfigurasi database benar
 
-// Fungsi untuk memeriksa apakah botId milik owner_id yang sama
+
 export default async function checkBotOwnership(botId: string, userId: string): Promise<boolean> {
     const timeStamp = new Date().toISOString();
     console.log('Executing method: checkBotOwnership');
     const client = await pool.connect();
 
     try {
-        // Query untuk mendapatkan owner_id berdasarkan botId
+        
         const query = 'SELECT owner_id FROM servobot2.main_prompt WHERE id = $1';
+
+        console.log("Qeury find woner: " + query);
         const result = await client.query(query, [botId]);
 
         if (result.rowCount === 0) {
@@ -19,7 +21,6 @@ export default async function checkBotOwnership(botId: string, userId: string): 
         const ownerId = result.rows[0].owner_id;
         console.log(`Bot ID: ${botId}, Owner ID: ${ownerId}, User ID: ${userId}`);
 
-        // Periksa apakah userId sama dengan owner_id
         if (userId !== ownerId.toString()) {
             console.error(`[${timeStamp}] User ID [${userId}] does not match Owner ID [${ownerId}]`);
             return false;
