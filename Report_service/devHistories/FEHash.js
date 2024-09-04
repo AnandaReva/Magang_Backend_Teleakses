@@ -2,7 +2,7 @@ const CryptoJS = require('crypto-js');
 
 
 //const session_secret = 'gOFhhf39yBnWdtBVZc2LAsHnFonLFUaFD92CUhonvrg='; 
-const session_secret = 'EHDyXELVRCkvfPzE0I3tWrGfZiMg2AICMPlvEN0kwio='; 
+const session_secret = '3VPRIYn6Zy9CMKwlTrY0fFux8bkzLMxdf3Om8c3lwBA='; 
 //api 1
 const parameters = {
     data: {
@@ -10,7 +10,7 @@ const parameters = {
         page: 0,
         sort_column: 0,
         direction: "desc",
-        bot_id: "59"
+        bot_id: "1"
     },
     from_date: 0,
     to_date: 0,

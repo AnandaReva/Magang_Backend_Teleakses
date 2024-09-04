@@ -23,13 +23,12 @@ export default async function validateRequestHash(req: Request): Promise<{ botId
 
         const client = await pool.connect();
         try {
-            // Fetch session data from the database
-            const sessionQuery = 'SELECT session_secret, user_id FROM servouser.session WHERE session_id = $1 LIMIT 1'; 
-            console.log(`sessionQuery:  ${sessionQuery}`);
+            const sessionQuery = 'SELECT session_secret, user_id FROM servouser.session WHERE session_id = $1 LIMIT 1';
+            console.log(`sessionQuery: ${sessionQuery}`);
             const result = await client.query(sessionQuery, [sessionId]);
 
             if (result.rowCount === 0) {
-                console.error(`Session data with id = [${sessionId}] not found in database\n`);
+                console.error(`[${timeStamp}] Session data with id = [${sessionId}] not found in database`);
                 return "0";
             }
 
@@ -37,9 +36,9 @@ export default async function validateRequestHash(req: Request): Promise<{ botId
             const userId = result.rows[0].user_id;
             const postBody = req.body;
 
-            console.log(`sessionSecret : ${sessionSecret}`)
-            console.log(`userId : ${userId}`)
-            console.log(`postBody : ${postBody}`)
+            console.log(`sessionSecret: ${sessionSecret}`);
+            console.log(`userId: ${userId}`);
+            console.log(`postBody: ${JSON.stringify(postBody)}`);
 
             const postBodyString = JSON.stringify(postBody);
             const hashExpected = createHMACSHA256Hash(postBodyString, sessionSecret.toString());
@@ -51,18 +50,19 @@ export default async function validateRequestHash(req: Request): Promise<{ botId
             if (hashReceived !== hashExpected) {
                 return "0";
             }
+
             const botId = postBody.data?.bot_id;
             if (!botId) {
                 console.error(`[${timeStamp}] Bot ID not found in request body`);
                 return "0";
             }
 
-            console.log("User ID from DB:", userId);
+            console.log(`User ID from DB: ${userId}`);
             console.log(`User ID received: ${userId}`);
 
             return {
                 botId: botId,
-                userId: userId.toString
+                userId: userId.toString()
             };
         } finally {
             client.release();
