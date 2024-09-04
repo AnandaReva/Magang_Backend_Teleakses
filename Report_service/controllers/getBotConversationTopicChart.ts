@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import dotenv from 'dotenv'
 import generateTimestamp from '../utils/generateTimeStamp'
 import validateRequestHash from "../utils/validateRequestHash";
+import checkOwnerId from "../utils/checkOwnerId";
 
 dotenv.config();
 export const getBotConversationTopicChart = async (req: Request, res: Response) => {
@@ -17,13 +18,29 @@ export const getBotConversationTopicChart = async (req: Request, res: Response) 
         return;
     }
     const botId = await validateRequestHash(req);
+
+    // Cek apakah hash valid dan botId berhasil diperoleh
     if (botId === "0") {
-        res.status(403).json({
-            error_code: `forbidden`
+        res.status(401).json({
+            error_code: `unauthorize`
         });
-        console.error(`[${timeStamp}]response sent: res.status(401=3).json({error_code: "Hash not valid"}); Hash not valid`);
+        console.error(`[${timeStamp}]response sent: res.status(401).json({error_code: "Hash not valid"}); Hash not valid`);
         return;
     }
+
+    console.log(`Bot ID received: ${botId}`);
+
+    // Cek apakah botId sama dengan owner_id
+    const isOwner = await checkOwnerId(botId);
+
+    if (!isOwner) {
+        res.status(403).json({
+            error_code: 'forbidden',
+        });
+        console.error(`[${timeStamp}]response sent: res.status(403).json({error_code: "forbidden", message: "Bot ID does not match owner ID"});`);
+        return;
+    }
+
 
     console.log('Hash is valid');
     console.log(`[${timeStamp}] continuing request to real backend url: [${realBackendURL}]`);
