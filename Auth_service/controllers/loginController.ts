@@ -26,7 +26,7 @@ export async function handleLoginRequest(req: Request, res: Response): Promise<v
 
         if (missingFields.length > 0) {
             res.status(401).json({
-                error: "Unauthorized",
+                error: "unauthorized",
             });
             console.error(`[${timestamp}] res.status(401).json: { error: "Invalid input", missingFields: ${JSON.stringify(missingFields)} }, \nrequest sent: ${JSON.stringify(req.body)}`);
             return;
@@ -34,7 +34,7 @@ export async function handleLoginRequest(req: Request, res: Response): Promise<v
 
         if (half_nonce.length !== 8) {
             res.status(401).json({
-                error: "Unauthorized",
+                error: "unauthorized",
             });
             console.error(`[${timestamp}] res.status(401).json: { error: "Invalid input", message: "half_nonce must be 8 characters long" }`);
             return;
@@ -46,7 +46,7 @@ export async function handleLoginRequest(req: Request, res: Response): Promise<v
 
         if (userResult.rowCount === 0) {
             res.status(401).json({
-                message: "Unauthorized",
+                message: "unauthorized",
             });
             console.error(`[${timestamp}] res.status(401).json: { timeStamp: "${timestamp}", message: "User not found" }`, { "username sent:": username });
             return;

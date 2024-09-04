@@ -46,7 +46,7 @@ export async function handleChallengeResponseVerification(
 
         if (missingFields.length > 0) {
             res.status(401).json({
-                error: "Unauthorized"
+                error: "unauthorized"
             });
             console.error(
                 `[${timestamp}] res.status(400).json: Missing fields:`,
@@ -67,7 +67,7 @@ export async function handleChallengeResponseVerification(
 
         if (challengeDataResult.rowCount === 0) {
             res.status(401).json({
-                error: "Unauthorized",
+                error: "unauthorized",
             });
             console.error(
                 `[${timestamp}] res.status(401).json: { error: "Challenge not valid", message: "The challenge provided is not valid. Please ensure that the full_nonce is correct." }`,
@@ -83,7 +83,7 @@ export async function handleChallengeResponseVerification(
         // Check if the timestamp is within the last 60 seconds
         if (currentTime - challengeTimestamp > BigInt(60)) {
             res.status(401).json({
-                message: "Unauthorized",
+                message: "unauthorized",
             });
             await deleteChallengeResponse(full_nonce);
             console.error(
@@ -163,7 +163,7 @@ export async function handleChallengeResponseVerification(
             );
         } else {
             res.status(401).json({
-                message: "Unauthorized",
+                message: "unauthorized",
             });
             console.error(
                 `[${timestamp}] res.status(401).json: { timeStamp: "${timestamp}", message: "Invalid challenge response" }`,

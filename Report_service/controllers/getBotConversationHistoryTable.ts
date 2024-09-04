@@ -21,7 +21,7 @@ export const getBotConversationHistoryTable = async (req: Request, res: Response
     const isHashValid = await validateRequestHash(req);
     if (!isHashValid) {
         res.status(401).json({
-            error_code: `Unauthorize`
+            error_code: `unauthorize`
         });
         console.error(`[${timeStamp}]response sent :  res.status(401).json({error_code: "Hash not valid"}); Hash not valid`);
         return;
