@@ -51,7 +51,6 @@ export default async function validateRequestHash(req: Request): Promise<{ botId
             if (hashReceived !== hashExpected) {
                 return "0";
             }
-
             const botId = postBody.data?.bot_id;
             if (!botId) {
                 console.error(`[${timeStamp}] Bot ID not found in request body`);

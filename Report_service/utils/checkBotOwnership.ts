@@ -10,7 +10,6 @@ export default async function checkBotOwnership(botId: string, userId: string): 
 
         const query = 'SELECT id, owner_id FROM servobot2.main_prompt WHERE id = $1 LIMIT 1';
         console.log("Query to find owner: " + query);
-
         const result = await client.query(query, [botId]);
         console.log( `query result : ${result}`)
 
