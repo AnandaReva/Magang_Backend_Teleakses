@@ -2,7 +2,7 @@ const CryptoJS = require('crypto-js');
 
 
 //const session_secret = 'gOFhhf39yBnWdtBVZc2LAsHnFonLFUaFD92CUhonvrg='; 
-const session_secret = '3VPRIYn6Zy9CMKwlTrY0fFux8bkzLMxdf3Om8c3lwBA='; 
+const session_secret = 'ZNf87zT5oqQ+mnU9EG/3UTQBIQoCy7aIag1WhYWYN5w='; 
 //api 1
 const parameters = {
     data: {
