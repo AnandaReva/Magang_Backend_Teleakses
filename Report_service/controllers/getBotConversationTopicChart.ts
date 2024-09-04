@@ -7,20 +7,21 @@ dotenv.config();
 
 
 export const getBotConversationTopicChart = async (req: Request, res: Response) => {
-
+    console.log("execute method: getBotConversationTopicChart");
+    console.log(`Request Body: ${JSON.stringify(req.body)}`)
     const timeStamp = generateTimestamp();
     const realBackendURL = process.env.endpoint3 ?? "";
-    console.log(`Real Bachend URL: ${realBackendURL}`);
+    console.log(`Real backend URL: ${realBackendURL}`);
     // Check if the URL is defined 
     if (!realBackendURL) {
-        res.status(500).json({ error: 'Internal server error' });
-        console.error(`[${timeStamp}] Response sent: res.status(500).json({ error: "Backend URL is not defined" }); Backend URL is not defined`);
+        res.status(500).json({ error_code: 'Internal server error_code' });
+        console.error(`[${timeStamp}] Response sent: res.status(500).json({ error_code: "Backend URL is not defined" }); Backend URL is not defined`);
         return;
     }
     const isHashValid = await validateRequestHash(req);
     if (!isHashValid) {
-        res.status(401).json({ error_code: 'Hash not valid' });
-        console.error(`[${timeStamp}]response sent :  res.status(401).json({error: "Hash not valid"}); Hash not valid`);
+        res.status(401).json({ error_code: 'Unauthorize' });
+        console.error(`[${timeStamp}]response sent :  res.status(401).json({error_code: "Hash not valid"}); Hash not valid`);
         return;
     }
     console.log('Hash is valid');
@@ -42,7 +43,7 @@ export const getBotConversationTopicChart = async (req: Request, res: Response) 
         console.log(`Response sent res.status(${realbackendResStatus}).json(${JSON.stringify(responseData)});`,);
     } catch (e) {
         console.error(`[${timeStamp}] Error forwarding request to backend: ${e}`);
-        res.status(500).json({ error_code: 'Failed to communicate with backend' });
+        res.status(500).json({ error_code: 'internal server error_code' });
     }
 }
 

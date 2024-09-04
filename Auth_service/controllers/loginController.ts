@@ -12,6 +12,7 @@ import calculateChallengeResponse from "../utils/calculateChallengeResponse";
 // Updated handleLoginRequest function with explicit schema references
 export async function handleLoginRequest(req: Request, res: Response): Promise<void> {
     console.log("execute method: handleLoginRequest");
+    console.log(`Request Body: ${JSON.stringify(req.body)}`)
     const timestamp = generateTimestamp();
     const client = await pool.connect();
 
@@ -24,20 +25,18 @@ export async function handleLoginRequest(req: Request, res: Response): Promise<v
         if (!half_nonce) missingFields.push('half_nonce');
 
         if (missingFields.length > 0) {
-            res.status(400).json({
-                error: "Invalid input",
-                missingFields,
+            res.status(401).json({
+                error: "Unauthorized",
             });
-            console.error(`[${timestamp}] res.status(400).json: { error: "Invalid input", missingFields: ${JSON.stringify(missingFields)} }, \nrequest sent: ${JSON.stringify(req.body)}`);
+            console.error(`[${timestamp}] res.status(401).json: { error: "Invalid input", missingFields: ${JSON.stringify(missingFields)} }, \nrequest sent: ${JSON.stringify(req.body)}`);
             return;
         }
 
         if (half_nonce.length !== 8) {
-            res.status(400).json({
-                error: "Invalid input",
-                message: "half_nonce must be 8 characters long",
+            res.status(401).json({
+                error: "Unauthorized",
             });
-            console.error(`[${timestamp}] res.status(400).json: { error: "Invalid input", message: "half_nonce must be 8 characters long" }`);
+            console.error(`[${timestamp}] res.status(401).json: { error: "Invalid input", message: "half_nonce must be 8 characters long" }`);
             return;
         }
 
@@ -47,7 +46,7 @@ export async function handleLoginRequest(req: Request, res: Response): Promise<v
 
         if (userResult.rowCount === 0) {
             res.status(401).json({
-                message: "User not found",
+                message: "Unauthorized",
             });
             console.error(`[${timestamp}] res.status(401).json: { timeStamp: "${timestamp}", message: "User not found" }`, { "username sent:": username });
             return;
@@ -83,13 +82,15 @@ export async function handleLoginRequest(req: Request, res: Response): Promise<v
 
         // Insert or update the challenge response
         const upsertQuery = `
-            INSERT INTO servouser.challenge_response (full_nonce, user_id, challenge_response, tstamp)
-            VALUES ($1, $2, $3, $4)
-            ON CONFLICT (full_nonce) DO UPDATE
-            SET challenge_response = EXCLUDED.challenge_response,
-                tstamp = EXCLUDED.tstamp
+        INSERT INTO servouser.challenge_response (full_nonce, user_id, challenge_response, tstamp)
+        VALUES ($1, $2, $3, $4)
+        ON CONFLICT (full_nonce) DO UPDATE
+        SET challenge_response = EXCLUDED.challenge_response,
+            tstamp = EXCLUDED.tstamp
         `;
+
         await client.query(upsertQuery, [full_nonce, user.id, challengeResponse, currentTime]);
+
 
         console.log("Send response to frontend");
         // Send response to frontend

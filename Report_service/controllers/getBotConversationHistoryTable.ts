@@ -5,30 +5,29 @@ import validateRequestHash from "../utils/validateRequestHash";
 
 dotenv.config();
 
-
-
-
 export const getBotConversationHistoryTable = async (req: Request, res: Response) => {
+    console.log("execute method: getBotConversationHistoryTable");
+    console.log(`Request Body: ${JSON.stringify(req.body)}`)
     const realBackendURL = process.env.endpoint1 ?? '';
-    console.log(`Real Bachend URL: ${realBackendURL}`);
+    console.log(`Real Backend URL: ${realBackendURL}`);
     const timeStamp = generateTimestamp();
 
-    // Check if the URL is defined 
+    // Check  URL is defined 
     if (!realBackendURL) {
-        res.status(500).json({ error: 'Internal server error' });
-        console.error(`[${timeStamp}] Response sent: res.status(500).json({ error: "Backend URL is not defined" }); Backend URL is not defined`);
+        res.status(500).json({ error_code: 'Internal server error_code' });
+        console.error(`[${timeStamp}] Response sent: res.status(500).json({ error_code: "Backend URL is not defined" }); Backend URL is not defined`);
         return;
     }
     const isHashValid = await validateRequestHash(req);
     if (!isHashValid) {
         res.status(401).json({
-            error_code: `Hash not valid`
+            error_code: `Unauthorize`
         });
-        console.error(`[${timeStamp}]response sent :  res.status(401).json({error: "Hash not valid"}); Hash not valid`);
+        console.error(`[${timeStamp}]response sent :  res.status(401).json({error_code: "Hash not valid"}); Hash not valid`);
         return;
     }
     //if hash valid 
-    console.log('Hash is valid');
+    console.log('---Hash is valid');
     console.log(`[${timeStamp} continuing request to real backend url: ${realBackendURL}]`);
     try {
 
@@ -50,6 +49,6 @@ export const getBotConversationHistoryTable = async (req: Request, res: Response
 
     } catch (e) {
         console.error(`[${timeStamp}] Error forwarding request to backend:' ${e}`);
-        res.status(500).json({ error: 'Failed to communicate with backend' });
+        res.status(500).json({ error_code: 'Internal server error_code' });
     }
 }

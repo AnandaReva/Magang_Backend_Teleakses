@@ -8,8 +8,10 @@ dotenv.config();
 
 
 export const getBotExecutiveSummary = async (req: Request, res: Response) => {
+    console.log("execute method: getBotExecutiveSummary");
+    console.log(`Request Body: ${JSON.stringify(req.body)}`)
     const realBackendURL = process.env.endpoint2 ?? "";
-    console.log(`Real Bachend URL: ${realBackendURL}`);
+    console.log(`Real Backend URL: ${realBackendURL}`);
     const timeStamp = generateTimestamp();
 
     // Check if the URL is defined 

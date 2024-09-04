@@ -9,7 +9,6 @@ const pool = new Pool({
     database: process.env.DB_NAME,
     password: process.env.DB_PASSWORD,
     port: Number(process.env.DB_PORT),
-    // There is no `options` property in the Pool constructor. `search_path` should be set using `SET` in SQL queries.
 });
 
 export default pool;

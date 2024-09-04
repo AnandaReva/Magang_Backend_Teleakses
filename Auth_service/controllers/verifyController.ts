@@ -35,6 +35,7 @@ export async function handleChallengeResponseVerification(
     res: Response
 ): Promise<void> {
     console.log("execute method: handleChallengeResponseVerification");
+    console.log(`Request Body: ${JSON.stringify(req.body)}`)
     const timestamp = generateTimestamp();
     try {
         const { full_nonce, challenge_response } = req.body;
@@ -44,9 +45,8 @@ export async function handleChallengeResponseVerification(
         if (!challenge_response) missingFields.push("challenge_response");
 
         if (missingFields.length > 0) {
-            res.status(400).json({
-                error: "Invalid input",
-                missingFields,
+            res.status(401).json({
+                error: "Unauthorized"
             });
             console.error(
                 `[${timestamp}] res.status(400).json: Missing fields:`,
@@ -67,9 +67,7 @@ export async function handleChallengeResponseVerification(
 
         if (challengeDataResult.rowCount === 0) {
             res.status(401).json({
-                error: "Challenge not valid",
-                message:
-                    "The challenge provided is not valid. Please ensure that the full_nonce is correct",
+                error: "Unauthorized",
             });
             console.error(
                 `[${timestamp}] res.status(401).json: { error: "Challenge not valid", message: "The challenge provided is not valid. Please ensure that the full_nonce is correct." }`,
@@ -79,13 +77,13 @@ export async function handleChallengeResponseVerification(
         }
 
         const challengeData = challengeDataResult.rows[0];
-        const currentTime = BigInt(Math.floor(Date.now() / 1000)); // Current time in seconds
+        const currentTime = BigInt(Math.floor(Date.now() / 1000));
         const challengeTimestamp = BigInt(challengeData.tstamp);
 
         // Check if the timestamp is within the last 60 seconds
         if (currentTime - challengeTimestamp > BigInt(60)) {
-            res.status(400).json({
-                message: "Challenge has expired",
+            res.status(401).json({
+                message: "Unauthorized",
             });
             await deleteChallengeResponse(full_nonce);
             console.error(
@@ -164,11 +162,11 @@ export async function handleChallengeResponseVerification(
                 }
             );
         } else {
-            res.status(400).json({
-                message: "Invalid challenge response",
+            res.status(401).json({
+                message: "Unauthorized",
             });
             console.error(
-                `[${timestamp}] res.status(400).json: { timeStamp: "${timestamp}", message: "Invalid challenge response" }`,
+                `[${timestamp}] res.status(401).json: { timeStamp: "${timestamp}", message: "Invalid challenge response" }`,
                 ` \nrequest sent: ${JSON.stringify(req.body)}`
             );
         }
