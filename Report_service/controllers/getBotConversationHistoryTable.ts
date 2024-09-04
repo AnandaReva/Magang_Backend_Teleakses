@@ -18,21 +18,40 @@ export const getBotConversationHistoryTable = async (req: Request, res: Response
         return;
     }
 
-     // Validate request hash
-     const validationResult = await validateRequestHash(req);
+    // Validate request hash
+    // Validate request hash
+    const validationResult = await validateRequestHash(req);
 
-     if (validationResult === "0") {
-         res.status(401).json({ error_code: 'unauthorized' });
-         console.error(`[${timeStamp}] Hash not valid`);
-         return;
-     }
- 
-     // Extract botId and userId from validationResult
-     const { botId, sessionData } = validationResult;
-     const { userId } = sessionData;
- 
-     console.log(`Bot ID received: ${botId}`);
-     console.log(`User ID from session data: ${userId}`);
+    if (validationResult === "0") {
+        res.status(401).json({ error_code: 'unauthorized' });
+        console.error(`[${timeStamp}] Hash not valid`);
+        return;
+    }
+
+    // Extract botId and userId from validationResult
+    const { botId, userId } = validationResult;
+
+    console.log(`Bot ID received: ${botId}`);
+    console.log(`User ID from session data: ${userId}`);
+
+    // Check if the bot ownership is valid
+    const isOwner = await checkBotOwnership(botId, userId);
+
+    if (!isOwner) {
+        res.status(403).json({ error_code: 'forbidden' });
+        console.error(`[${timeStamp}] Response sent: res.status(403).json({ error_code: "forbidden", message: "Bot ID does not match owner ID" });`);
+        return;
+    }
+
+    console.log('Hash is valid');
+    console.log(`[${timeStamp}] Continuing request to real backend URL: ${realBackendURL}`);
+
+
+
+
+
+    console.log(`Bot ID received: ${botId}`);
+    console.log(`User ID from session data: ${userId}`);
 
     // Proceed if hash is valid
     console.log('---Hash is valid');

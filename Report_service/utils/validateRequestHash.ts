@@ -2,7 +2,7 @@ import pool from '../db/config';
 import createHMACSHA256Hash from "../utils/createHMACSHA256Hash";
 import { Request } from "express";
 
-export default async function validateRequestHash(req: Request): Promise<{ botId: string, sessionData: { userId: string, sessionSecret: string } } | "0"> {
+export default async function validateRequestHash(req: Request): Promise<{ botId: string, userId: string } | "0"> {
     const timeStamp = new Date().toISOString();
     console.log('Executing method: validateRequestHash');
 
@@ -23,7 +23,7 @@ export default async function validateRequestHash(req: Request): Promise<{ botId
 
         const client = await pool.connect();
         try {
-            // Fetch session data from the database, including the schema
+            // Fetch session data from the database
             const sessionQuery = 'SELECT session_secret, user_id FROM servouser.session WHERE session_id = $1';
             const result = await client.query(sessionQuery, [sessionId]);
 
@@ -53,16 +53,12 @@ export default async function validateRequestHash(req: Request): Promise<{ botId
                 return "0";
             }
 
-
-            console.log("user id from db: ", userId)
+            console.log("User ID from DB:", userId);
             console.log(`User ID received: ${userId}`);
 
             return {
                 botId: botId,
-                sessionData: {
-                    userId: userId,
-                    sessionSecret: sessionSecret
-                }
+                userId: userId.toString
             };
         } finally {
             client.release();

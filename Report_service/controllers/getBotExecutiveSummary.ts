@@ -22,7 +22,6 @@ export const getBotExecutiveSummary = async (req: Request, res: Response) => {
 
 
 
-    // Validate request hash
     const validationResult = await validateRequestHash(req);
 
     if (validationResult === "0") {
@@ -32,8 +31,7 @@ export const getBotExecutiveSummary = async (req: Request, res: Response) => {
     }
 
     // Extract botId and userId from validationResult
-    const { botId, sessionData } = validationResult;
-    const { userId } = sessionData;
+    const { botId, userId } = validationResult;
 
     console.log(`Bot ID received: ${botId}`);
     console.log(`User ID from session data: ${userId}`);
