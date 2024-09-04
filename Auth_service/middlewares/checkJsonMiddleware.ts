@@ -11,11 +11,11 @@ const checkJsonMiddleware = (err: any, req: Request, res: Response, next: NextFu
         console.error(`[${timeStamp}] Parsing error:`, err.message);
 
         return res.status(400).json({
-            error: `Invalid JSON format: [${err.message}]`,
-            message: 'The JSON payload is improperly formatted. Please check your request body.',
+            error_code: `Invalid JSON format]`,
+
         });
     }
-    next(err);  
+    next(err);
 };
 
 export default checkJsonMiddleware;
