@@ -24,7 +24,8 @@ export default async function validateRequestHash(req: Request): Promise<{ botId
         const client = await pool.connect();
         try {
             // Fetch session data from the database
-            const sessionQuery = 'SELECT session_secret, user_id FROM servouser.session WHERE session_id = $1';
+            const sessionQuery = 'SELECT session_secret, user_id FROM servouser.session WHERE session_id = $1 LIMIT 1'; 
+            console.log(`sessionQuery:  ${sessionQuery}`);
             const result = await client.query(sessionQuery, [sessionId]);
 
             if (result.rowCount === 0) {
@@ -35,6 +36,10 @@ export default async function validateRequestHash(req: Request): Promise<{ botId
             const sessionSecret = result.rows[0].session_secret;
             const userId = result.rows[0].user_id;
             const postBody = req.body;
+
+            console.log(`sessionSecret : ${sessionSecret}`)
+            console.log(`userId : ${userId}`)
+            console.log(`postBody : ${postBody}`)
 
             const postBodyString = JSON.stringify(postBody);
             const hashExpected = createHMACSHA256Hash(postBodyString, sessionSecret.toString());

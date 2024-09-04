@@ -12,7 +12,7 @@ export default async function checkBotOwnership(botId: string, userId: string): 
         console.log("Query to find owner: " + query);
 
         const result = await client.query(query, [botId]);
-
+        console.log( `query result : ${result}`)
 
         if (result.rowCount === 0) {
             console.error(`[${timeStamp}] Bot with id = [${botId}] not found`);

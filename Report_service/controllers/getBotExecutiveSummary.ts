@@ -3,6 +3,8 @@ import dotenv from 'dotenv'
 import generateTimestamp from '../utils/generateTimeStamp'
 import validateRequestHash from "../utils/validateRequestHash";
 import checkBotOwnership from "../utils/checkBotOwnership";
+
+
 dotenv.config();
 
 
@@ -18,8 +20,6 @@ export const getBotExecutiveSummary = async (req: Request, res: Response) => {
         console.error(`[${timeStamp}] Response sent: res.status(500).json({ error: "Backend URL is not defined" }); Backend URL is not defined`);
         return;
     }
-
-
 
 
     const validationResult = await validateRequestHash(req);
