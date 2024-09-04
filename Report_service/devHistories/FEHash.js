@@ -19,21 +19,21 @@ const parameters = {
 };
 
 //api 2
-// const parameters = {
+/* const parameters = {
 
-//     data: {
-//         bot_id: "59"
-//     },
-//     from_date: 0,
-//     to_date: 0,
-//     date_mode: 0
+    data: {
+        bot_id: "1"
+    },
+    from_date: 0,
+    to_date: 0,
+    date_mode: 0
 
-// };
+}; */
 
 //api3
 // const parameters = {
 //     data: {
-//         bot_id: "string"
+//         bot_id: "1"
 //     },
 //     from_date: 0,
 //     to_date: 0,
