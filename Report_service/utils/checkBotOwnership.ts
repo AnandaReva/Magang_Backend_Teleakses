@@ -1,7 +1,7 @@
 import pool from '../db/config'; // Pastikan path ke konfigurasi database benar
 
 // Fungsi untuk memeriksa apakah botId milik owner_id yang sama
-export default async function checkBotOwnership(botId: string): Promise<boolean> {
+export default async function checkBotOwnership(botId: string, userId: string): Promise<boolean> {
     const timeStamp = new Date().toISOString();
     console.log('Executing method: checkBotOwnership');
     const client = await pool.connect();
@@ -17,10 +17,15 @@ export default async function checkBotOwnership(botId: string): Promise<boolean>
         }
 
         const ownerId = result.rows[0].owner_id;
-        console.log(`Bot ID: ${botId}, Owner ID: ${ownerId}`);
+        console.log(`Bot ID: ${botId}, Owner ID: ${ownerId}, User ID: ${userId}`);
 
-        // Periksa apakah botId sama dengan owner_id
-        return botId === ownerId.toString();
+        // Periksa apakah userId sama dengan owner_id
+        if (userId !== ownerId.toString()) {
+            console.error(`[${timeStamp}] User ID [${userId}] does not match Owner ID [${ownerId}]`);
+            return false;
+        }
+
+        return true;
     } catch (error) {
         console.error(`[${timeStamp}] Error in checkBotOwnership:`, error);
         return false;

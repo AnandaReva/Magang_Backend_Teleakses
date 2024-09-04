@@ -19,7 +19,7 @@ export async function handleLoginRequest(req: Request, res: Response): Promise<v
     try {
         const { username, half_nonce } = req.body;
 
-        // Validate each field
+        // Validat field
         const missingFields = [];
         if (!username) missingFields.push('username');
         if (!half_nonce) missingFields.push('half_nonce');
@@ -61,7 +61,7 @@ export async function handleLoginRequest(req: Request, res: Response): Promise<v
         const currentTime = BigInt(Math.floor(Date.now() / 1000));
 
         // If a challenge exists and was created within the last 10 seconds, reject the request
-        if ((challengeResult.rowCount ?? 0) > 0) { // Use ?? to handle null or undefined
+        if ((challengeResult.rowCount ?? 0) > 0) { 
             const existingChallenge = challengeResult.rows[0];
             if ((currentTime - BigInt(existingChallenge.tstamp)) < 10) {
                 res.status(429).json({
@@ -90,15 +90,12 @@ export async function handleLoginRequest(req: Request, res: Response): Promise<v
         `;
 
         await client.query(upsertQuery, [full_nonce, user.id, challengeResponse, currentTime]);
-
-
         console.log("Send response to frontend");
         // Send response to frontend
         res.json({
             full_nonce,
             salt: user.salt,
         });
-
         console.log(`[${timestamp}] Response sent: res.json.status(200):`, {
             full_nonce,
             salt: user.salt,

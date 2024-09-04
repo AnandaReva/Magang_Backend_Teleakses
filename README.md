@@ -8,3 +8,4 @@ Progress:
 - Split project services
 - Check challnege_response, if already exist and timestamp < 10s reject
 - Check if challnege_respons timestamp > 10s reject
+- Fix error message
