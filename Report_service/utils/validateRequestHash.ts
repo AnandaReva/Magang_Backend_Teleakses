@@ -1,5 +1,4 @@
 import pool from '../db/config';
-
 import createHMACSHA256Hash from "../utils/createHMACSHA256Hash";
 import { Request } from "express";
 
@@ -24,8 +23,8 @@ export default async function validateRequestHash(req: Request): Promise<boolean
 
         const client = await pool.connect();
         try {
-            // Fetch session data from the database
-            const sessionQuery = 'SELECT session_secret FROM session WHERE session_id = $1';
+            // Fetch session data from the database, including the schema
+            const sessionQuery = 'SELECT session_secret FROM servuoser.session WHERE session_id = $1';
             const result = await client.query(sessionQuery, [sessionId]);
 
             if (result.rowCount === 0) {
