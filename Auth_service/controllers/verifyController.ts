@@ -124,7 +124,7 @@ export async function handleChallengeResponseVerification(
             console.log(`[  nonce2: ${nonce2} ]`);
             console.log(`[  session_secret: ${session_secret}]`);
 
-            console.log("Inserting session data to database");
+            console.log("Inserting session data to database with upsert");
             await pool.query(
                 `INSERT INTO servouser.session (session_id, user_id, session_secret, tstamp, st)
                  VALUES ($1, $2, $3, $4, $5)
@@ -174,10 +174,10 @@ export async function handleChallengeResponseVerification(
         await deleteChallengeResponse(full_nonce);
     } catch (e) {
         res.status(500).json({
-            error: "Internal server error",
+            error: "internal server error",
         });
         console.error(
-            `[${timestamp}] Error during verifying challenge response: { error: "Internal server error", details: "${e}" }`,
+            `[${timestamp}] Error during verifying challenge response: { error: "internal server error", details: "${e}" }`,
             ` \nrequest sent: ${JSON.stringify(req.body)}`
         );
     }

@@ -105,7 +105,7 @@ export async function handleLoginRequest(req: Request, res: Response): Promise<v
         });
     } catch (e) {
         res.status(500).json({
-            message: "Internal server error",
+            message: "internal server error",
         });
         console.error(`[${timestamp}] res.status(500).json: Error during handling login request`, e, ` \nrequest sent: ${JSON.stringify(req.body)}`);
     } finally {

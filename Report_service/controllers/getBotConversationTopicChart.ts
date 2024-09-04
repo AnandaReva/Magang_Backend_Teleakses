@@ -14,7 +14,7 @@ export const getBotConversationTopicChart = async (req: Request, res: Response) 
     console.log(`Real backend URL: ${realBackendURL}`);
     // Check if the URL is defined 
     if (!realBackendURL) {
-        res.status(500).json({ error_code: 'Internal server error_code' });
+        res.status(500).json({ error_code: 'internal server error' });
         console.error(`[${timeStamp}] Response sent: res.status(500).json({ error_code: "Backend URL is not defined" }); Backend URL is not defined`);
         return;
     }
@@ -43,7 +43,7 @@ export const getBotConversationTopicChart = async (req: Request, res: Response) 
         console.log(`Response sent res.status(${realbackendResStatus}).json(${JSON.stringify(responseData)});`,);
     } catch (e) {
         console.error(`[${timeStamp}] Error forwarding request to backend: ${e}`);
-        res.status(500).json({ error_code: 'internal server error_code' });
+        res.status(500).json({ error_code: 'internal server error' });
     }
 }
 

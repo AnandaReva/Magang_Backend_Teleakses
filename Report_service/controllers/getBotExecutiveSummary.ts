@@ -16,7 +16,7 @@ export const getBotExecutiveSummary = async (req: Request, res: Response) => {
 
     // Check if the URL is defined 
     if (!realBackendURL) {
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: 'internal server error' });
         console.error(`[${timeStamp}] Response sent: res.status(500).json({ error: "Backend URL is not defined" }); Backend URL is not defined`);
         return;
     }
