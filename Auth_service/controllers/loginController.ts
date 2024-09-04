@@ -42,7 +42,7 @@ export async function handleLoginRequest(req: Request, res: Response): Promise<v
         }
 
         // Get user data from the database with explicit schema
-        const userQuery = 'SELECT id, salt, saltedpassword FROM servuoser.user WHERE username = $1';
+        const userQuery = 'SELECT id, salt, saltedpassword FROM servouser.user WHERE username = $1';
         const userResult = await client.query(userQuery, [username]);
 
         if (userResult.rowCount === 0) {
@@ -56,7 +56,7 @@ export async function handleLoginRequest(req: Request, res: Response): Promise<v
         const user = userResult.rows[0];
 
         // Check if there's an existing challenge for the user
-        const challengeQuery = 'SELECT * FROM servuoser.challenge_response WHERE user_id = $1';
+        const challengeQuery = 'SELECT * FROM servouser.challenge_response WHERE user_id = $1';
         const challengeResult = await client.query(challengeQuery, [user.id.toString()]);
 
         const currentTime = BigInt(Math.floor(Date.now() / 1000));
@@ -83,7 +83,7 @@ export async function handleLoginRequest(req: Request, res: Response): Promise<v
 
         // Insert or update the challenge response
         const upsertQuery = `
-            INSERT INTO servuoser.challenge_response (full_nonce, user_id, challenge_response, tstamp)
+            INSERT INTO servouser.challenge_response (full_nonce, user_id, challenge_response, tstamp)
             VALUES ($1, $2, $3, $4)
             ON CONFLICT (full_nonce) DO UPDATE
             SET challenge_response = EXCLUDED.challenge_response,

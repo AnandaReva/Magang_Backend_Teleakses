@@ -15,7 +15,7 @@ async function deleteChallengeResponse(full_nonce: string): Promise<void> {
         console.log("fullNonce: ", full_nonce);
 
         const { rowCount } = await pool.query(
-            "DELETE FROM servuoser.challenge_response WHERE full_nonce = $1 RETURNING *",
+            "DELETE FROM servouser.challenge_response WHERE full_nonce = $1 RETURNING *",
             [full_nonce]
         );
 
@@ -59,8 +59,8 @@ export async function handleChallengeResponseVerification(
         // Find challenge response in DB
         const challengeDataResult = await pool.query(
             `SELECT cr.*, u.saltedpassword, u.full_name, u.id as user_id 
-            FROM servuoser.challenge_response cr
-            JOIN servuoser.user u ON cr.user_id = u.id
+            FROM servouser.challenge_response cr
+            JOIN servouser.user u ON cr.user_id = u.id
             WHERE cr.full_nonce = $1`,
             [full_nonce]
         );
@@ -128,7 +128,7 @@ export async function handleChallengeResponseVerification(
 
             console.log("Inserting session data to database");
             await pool.query(
-                `INSERT INTO servuoser.session (session_id, user_id, session_secret, tstamp, st)
+                `INSERT INTO servouser.session (session_id, user_id, session_secret, tstamp, st)
                  VALUES ($1, $2, $3, $4, $5)
                  ON CONFLICT (user_id) DO UPDATE
                  SET session_id = EXCLUDED.session_id,
