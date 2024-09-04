@@ -13,20 +13,28 @@ export const getBotExecutiveSummary = async (req: Request, res: Response) => {
     const realBackendURL = process.env.endpoint2 ?? "";
     console.log(`Real Backend URL: ${realBackendURL}`);
     const timeStamp = generateTimestamp();
-
-    // Check if the URL is defined 
     if (!realBackendURL) {
         res.status(500).json({ error: 'internal server error' });
         console.error(`[${timeStamp}] Response sent: res.status(500).json({ error: "Backend URL is not defined" }); Backend URL is not defined`);
         return;
     }
 
-    const isHashValid = await validateRequestHash(req);
-    if (!isHashValid) {
-        res.status(401).json({ error_code: 'Hash not valid' });
-        console.error(`[${timeStamp}]response sent :  res.status(401).json({error: "Hash not valid"}); Hash not valid`);
+
+
+
+    const botId = await validateRequestHash(req);
+    console.log(`Bot Id: ${botId}`);
+
+
+    if (botId === "0") {
+        res.status(403).json({
+            error_code: `forbidden`
+        });
+        console.error(`[${timeStamp}]response sent: res.status(403).json({error_code: "Hash not valid"}); Hash not valid`);
         return;
     }
+
+
     console.log('Hash is valid');
     console.log(`[${timeStamp} continuing request to real backend url: ${realBackendURL}]`);
     try {
@@ -48,4 +56,5 @@ export const getBotExecutiveSummary = async (req: Request, res: Response) => {
         console.error(`[${timeStamp}] Error forwarding request to backend: ${e}`);
         res.status(500).json({ error_code: 'Failed to communicate with backend' });
     }
+
 }

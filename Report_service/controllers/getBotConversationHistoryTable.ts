@@ -5,6 +5,9 @@ import validateRequestHash from "../utils/validateRequestHash";
 
 dotenv.config();
 
+function checkBot() { }
+
+
 export const getBotConversationHistoryTable = async (req: Request, res: Response) => {
     console.log("execute method: getBotConversationHistoryTable");
     console.log(`Request Body: ${JSON.stringify(req.body)}`)
@@ -18,19 +21,24 @@ export const getBotConversationHistoryTable = async (req: Request, res: Response
         console.error(`[${timeStamp}] Response sent: res.status(500).json({ error_code: "Backend URL is not defined" }); Backend URL is not defined`);
         return;
     }
-    const isHashValid = await validateRequestHash(req);
-    if (!isHashValid) {
-        res.status(401).json({
-            error_code: `unauthorize`
+
+
+    const botId = await validateRequestHash(req);
+
+
+    if (botId === "0") {
+        res.status(403).json({
+            error_code: `forbidden`
         });
-        console.error(`[${timeStamp}]response sent :  res.status(401).json({error_code: "Hash not valid"}); Hash not valid`);
+        console.error(`[${timeStamp}]response sent: res.status(401).json({error_code: "Hash not valid"}); Hash not valid`);
         return;
     }
+
+
     //if hash valid 
     console.log('---Hash is valid');
     console.log(`[${timeStamp} continuing request to real backend url: ${realBackendURL}]`);
     try {
-
         // Send to real backend
         const backendResponse = await fetch(realBackendURL, {
             method: 'POST',
@@ -46,7 +54,6 @@ export const getBotConversationHistoryTable = async (req: Request, res: Response
         res.status(realbackendResStatus).json(responseData);
         console.log(`Response real backend: res.status(${realbackendResStatus}).json(${JSON.stringify(responseData)});`,);
         console.log(`Response sent res.status(${realbackendResStatus}).json(${JSON.stringify(responseData)});`,);
-
     } catch (e) {
         console.error(`[${timeStamp}] Error forwarding request to backend:' ${e}`);
         res.status(500).json({ error_code: 'internal server error' });
