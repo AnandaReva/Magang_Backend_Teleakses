@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import generateTimestamp from '../utils/generateTimeStamp';
 import validateRequestHash from "../utils/validateRequestHash";
-import checkBotOwnership from "../utils/checkBotOwnership";
+import checkBotOrganization from "../utils/checkBotOrganization";
 
 dotenv.config();
 
@@ -12,14 +12,12 @@ export const getBotConversationHistoryTable = async (req: Request, res: Response
     console.log(`Request Body: ${JSON.stringify(req.body)}`);
     const realBackendURL = process.env.endpoint1 ?? '';
     const timeStamp = generateTimestamp();
-
     // Check if the URL is defined
     if (!realBackendURL) {
         res.status(500).json({ error_code: 'internal server error' });
         console.error(`[${timeStamp}] Response sent: res.status(500).json({ error_code: "internal server error", message: "Backend URL is not defined" });`);
         return;
     }
-
     // Validate request hash
     const validationResult = await validateRequestHash(req);
 
@@ -35,8 +33,8 @@ export const getBotConversationHistoryTable = async (req: Request, res: Response
     console.log(`User ID from session data: ${userId}`);
     console.log(`Organization ID from session data: ${organizationId}`);
 
-    // Check if the bot ownership is valid
-    const isOrganization = await checkBotOwnership(botId, userId, organizationId);
+    // Check if the bot organization is valid
+    const isOrganization = await checkBotOrganization(botId, userId, organizationId);
     if (!isOrganization) {
         res.status(403).json({ error_code: 'forbidden' });
         console.error(`[${timeStamp}] Response sent: res.status(403).json({ error_code: "forbidden", message: "Bot ID does not match organization ID" });`);

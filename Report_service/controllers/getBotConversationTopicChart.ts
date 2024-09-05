@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import dotenv from 'dotenv'
 import generateTimestamp from '../utils/generateTimeStamp'
 import validateRequestHash from "../utils/validateRequestHash";
-import checkBotOwnership from "../utils/checkBotOwnership";
+import checkBotOrganization from "../utils/checkBotOrganization";
 
 dotenv.config();
 export const getBotConversationTopicChart = async (req: Request, res: Response) => {
@@ -28,8 +28,8 @@ export const getBotConversationTopicChart = async (req: Request, res: Response) 
     console.log(`User ID from session data: ${userId}`);
     console.log(`Organization ID from session data: ${organizationId}`);
 
-    // Check if the bot ownership is valid
-    const isOrganization = await checkBotOwnership(botId, userId, organizationId);
+    // Check if the bot organization is valid
+    const isOrganization = await checkBotOrganization(botId, userId, organizationId);
     if (!isOrganization) {
         res.status(403).json({ error_code: 'forbidden' });
         console.error(`[${timeStamp}] Response sent: res.status(403).json({ error_code: "forbidden", message: "Bot ID does not match organization ID" });`);

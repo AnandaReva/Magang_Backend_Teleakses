@@ -5,7 +5,6 @@ import { Request } from "express";
 export default async function validateRequestHash(req: Request): Promise<{ botId: string, organizationId: string, userId: string } | "0"> {
     const timeStamp = new Date().toISOString();
     console.log('Executing method: validateRequestHash');
-
     try {
         const sessionId = req.headers['ecwx-session-id'] as string || '';
         const hashReceived = req.headers['ecwx-hash'] as string || '';
@@ -23,9 +22,9 @@ export default async function validateRequestHash(req: Request): Promise<{ botId
 
         const client = await pool.connect();
         try {
-            // Left join to get organization_id from the user table
+        
             const sessionQuery = 'SELECT a.session_secret, a.user_id, b.organization_id FROM servouser.session a LEFT JOIN servouser.user b ON b.id = a.user_id WHERE a.session_id = $1 LIMIT 1';
-            console.log(`sessionQuery: ${sessionQuery}`);
+            console.log(`Query to find session data and orhanization id: ${sessionQuery}`);
             const result = await client.query(sessionQuery, [sessionId]);
 
             if (result.rowCount === 0) {
@@ -33,7 +32,7 @@ export default async function validateRequestHash(req: Request): Promise<{ botId
                 return "0";
             }
 
-            console.log("result dari qury mencari organization id" , result.rowCount)
+            console.log("result from session and organization  query" , result.rowCount)
 
             const sessionSecret = result.rows[0].session_secret;
             const userId = result.rows[0].user_id;
