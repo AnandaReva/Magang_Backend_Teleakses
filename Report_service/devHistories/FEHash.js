@@ -2,14 +2,37 @@ const CryptoJS = require('crypto-js');
 
 
 //const session_secret = 'gOFhhf39yBnWdtBVZc2LAsHnFonLFUaFD92CUhonvrg='; 
-const session_secret = 'gvBuA0NoqgzdSqngohwdP1MHL2DBjmxaXQD5BfMrAX0='; 
+const session_secret = 'Xopznz7u5j+gOSb6EPshATB9A+zihAmFyUa6Xt8g2AI=';
 //api 1
+// const parameters = {
+//     data: {
+//         row_length: 0,
+//         page: 0,
+//         sort_column: 0,
+//         direction: "desc",
+//         bot_id: "1"
+//     },
+//     from_date: 0,
+//     to_date: 0,
+//     search_filter: "string",
+//     date_mode: 0
+// };
+
+//api 2
+// const parameters = {
+
+//     data: {
+//         bot_id: "1"
+//     },
+//     from_date: 0,
+//     to_date: 0,
+//     date_mode: 0
+
+// };
+
+//api3
 const parameters = {
     data: {
-        row_length: 0,
-        page: 0,
-        sort_column: 0,
-        direction: "desc",
         bot_id: "1"
     },
     from_date: 0,
@@ -18,28 +41,14 @@ const parameters = {
     date_mode: 0
 };
 
-//api 2
-/* const parameters = {
+//api4
 
-    data: {
-        bot_id: "1"
-    },
-    from_date: 0,
-    to_date: 0,
-    date_mode: 0
-
-}; */
-
-//api3
 // const parameters = {
-//     data: {
-//         bot_id: "1"
-//     },
-//     from_date: 0,
-//     to_date: 0,
-//     search_filter: "string",
-//     date_mode: 0
+//     job_id: "1725331930-c25c0600518e422c8a6ce2ee51998089"
 // };
+
+
+
 
 
 

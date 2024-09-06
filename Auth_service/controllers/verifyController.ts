@@ -1,24 +1,20 @@
 
 import { Request, Response } from "express";
 import generateTimestamp from "../utils/generateTimeStamp";
+
 import createHMACSHA256Hash from "../utils/createHMACSHA256Hash";
 import generateRandomString from "../utils/generateRandomString";
 import calculateChallengeResponse from "../utils/calculateChallengeResponse";
-
-
 import pool from '../db/config'
-
 
 async function deleteChallengeResponse(full_nonce: string): Promise<void> {
     try {
         console.log("execute method: deleteChallengeResponse");
         console.log("fullNonce: ", full_nonce);
-
         const { rowCount } = await pool.query(
             "DELETE FROM servouser.challenge_response WHERE full_nonce = $1 RETURNING *",
             [full_nonce]
         );
-
         if (rowCount === 0) {
             console.error("Challenge response not found for deletion:", full_nonce);
         } else {
@@ -28,7 +24,6 @@ async function deleteChallengeResponse(full_nonce: string): Promise<void> {
         console.error("Failed to delete challenge response:", error);
     }
 }
-
 
 export async function handleChallengeResponseVerification(
     req: Request,
@@ -46,7 +41,7 @@ export async function handleChallengeResponseVerification(
 
         if (missingFields.length > 0) {
             res.status(401).json({
-                error: "unauthorized"
+                error: "unauthenticated"
             });
             console.error(
                 `[${timestamp}] res.status(400).json: Missing fields:`,
@@ -55,7 +50,6 @@ export async function handleChallengeResponseVerification(
             );
             return;
         }
-
         // Find challenge response in DB
         const challengeDataResult = await pool.query(
             `SELECT cr.*, u.saltedpassword, u.full_name, u.id as user_id 
@@ -64,10 +58,9 @@ export async function handleChallengeResponseVerification(
             WHERE cr.full_nonce = $1`,
             [full_nonce]
         );
-
         if (challengeDataResult.rowCount === 0) {
             res.status(401).json({
-                error: "unauthorized",
+                error: "unauthenticated",
             });
             console.error(
                 `[${timestamp}] res.status(401).json: { error: "Challenge not valid", message: "The challenge provided is not valid. Please ensure that the full_nonce is correct." }`,
@@ -83,7 +76,7 @@ export async function handleChallengeResponseVerification(
         // Check if the timestamp is within the last 60 seconds
         if (currentTime - challengeTimestamp > BigInt(60)) {
             res.status(401).json({
-                message: "unauthorized",
+                message: "unauthenticated",
             });
             await deleteChallengeResponse(full_nonce);
             console.error(
@@ -163,7 +156,7 @@ export async function handleChallengeResponseVerification(
             );
         } else {
             res.status(401).json({
-                message: "unauthorized",
+                message: "unauthenticated",
             });
             console.error(
                 `[${timestamp}] res.status(401).json: { timeStamp: "${timestamp}", message: "Invalid challenge response" }`,

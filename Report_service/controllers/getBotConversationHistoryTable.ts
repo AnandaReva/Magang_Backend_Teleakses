@@ -1,15 +1,13 @@
-// Import statements
 import { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import generateTimestamp from '../utils/generateTimeStamp';
 import validateRequestHash from "../utils/validateRequestHash";
 import checkBotOrganization from "../utils/checkBotOrganization";
-
 dotenv.config();
 
 export const getBotConversationHistoryTable = async (req: Request, res: Response) => {
     console.log("Executing method: getBotConversationHistoryTable");
-    console.log(`Request Body: ${JSON.stringify(req.body)}`);
+    
     const realBackendURL = process.env.endpoint1 ?? '';
     const timeStamp = generateTimestamp();
     // Check if the URL is defined

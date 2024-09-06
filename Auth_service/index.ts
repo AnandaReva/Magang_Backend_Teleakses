@@ -1,9 +1,9 @@
 import express from 'express';
-import { Pool } from 'pg';
 import dotenv from 'dotenv';
-import authRoutes from './routes/authRoutes'; 
+import authRoutes from './routes/authRoutes';
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './swagger.json';
+import pool from './db/config';
 import checkJsonMiddleware from './middlewares/checkJsonMiddleware'
 import checkIpMiddleware from './middlewares/checkIpMiddleware';
 const app = express();
@@ -11,32 +11,21 @@ const app = express();
 dotenv.config();
 // middlewares
 app.use(checkIpMiddleware);
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 app.use(checkJsonMiddleware);
 
-const pool = new Pool({
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    password: process.env.DB_PASSWORD,
-    port: Number(process.env.DB_PORT),
-});
 
 app.get('/', async (req, res) => {
     const client = await pool.connect();
-
     try {
-        // Use the client to run a simple query to verify the connection
         await client.query('SELECT NOW()');
-        res.send('Connected to database');
+        res.send('request received');
+        console.error(' Connected to database');
     } catch (e) {
         console.error('Cannot connect to database:', e);
-        res.status(500).send('Cannot connect to database');
+        res.status(500).send('something went wrong');
     } finally {
-        // Release the client back to the pool
         client.release();
     }
 });

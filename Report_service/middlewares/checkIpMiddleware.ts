@@ -5,7 +5,6 @@ const checkIpMiddleware = function (req: Request, res: Response, next: NextFunct
     const ipAddress = req.headers['x-forwarded-for'] || req.socket.remoteAddress
     console.log('\n','------------------------------------------');
     console.log(`[${new Date().toISOString()}] Incoming request from IP: ${ipAddress}`);
-    console.log("Request Body: " + req.body)
     next();
 }
 export default checkIpMiddleware;

@@ -26,7 +26,7 @@ export async function handleLoginRequest(req: Request, res: Response): Promise<v
 
         if (missingFields.length > 0) {
             res.status(401).json({
-                error: "unauthorized",
+                error: "unauthenticated",
             });
             console.error(`[${timestamp}] res.status(401).json: { error: "Invalid input", missingFields: ${JSON.stringify(missingFields)} }, \nrequest sent: ${JSON.stringify(req.body)}`);
             return;
@@ -34,19 +34,23 @@ export async function handleLoginRequest(req: Request, res: Response): Promise<v
 
         if (half_nonce.length !== 8) {
             res.status(401).json({
-                error: "unauthorized",
+                error: "unauthenticated",
             });
             console.error(`[${timestamp}] res.status(401).json: { error: "Invalid input", message: "half_nonce must be 8 characters long" }`);
             return;
         }
 
-        // Get user data from the database with explicit schema
         const userQuery = 'SELECT id, salt, saltedpassword FROM servouser.user WHERE username = $1';
         const userResult = await client.query(userQuery, [username]);
 
+        // faking data 
         if (userResult.rowCount === 0) {
+            const fakeFullNone = half_nonce + generateRandomString(8);
+            const fakeSalt = generateRandomString(8);
+            console.log("--username incorrect: \n generating fake data: " , " Fake full_nonce: ",  fakeFullNone , "Fake salt:"  ,fakeSalt)
             res.status(401).json({
-                message: "unauthorized",
+                full_nonce: fakeFullNone,
+                salt: fakeSalt,
             });
             console.error(`[${timestamp}] res.status(401).json: { timeStamp: "${timestamp}", message: "User not found" }`, { "username sent:": username });
             return;
@@ -61,7 +65,7 @@ export async function handleLoginRequest(req: Request, res: Response): Promise<v
         const currentTime = BigInt(Math.floor(Date.now() / 1000));
 
         // If a challenge exists and was created within the last 10 seconds, reject the request
-        if ((challengeResult.rowCount ?? 0) > 0) { 
+        if ((challengeResult.rowCount ?? 0) > 0) {
             const existingChallenge = challengeResult.rows[0];
             if ((currentTime - BigInt(existingChallenge.tstamp)) < 10) {
                 res.status(429).json({
@@ -79,7 +83,6 @@ export async function handleLoginRequest(req: Request, res: Response): Promise<v
         console.log("[fullNonce: ", full_nonce, ']');
 
         const challengeResponse = calculateChallengeResponse(full_nonce, user.saltedpassword);
-
         // Insert or update the challenge response
         const upsertQuery = `
         INSERT INTO servouser.challenge_response (full_nonce, user_id, challenge_response, tstamp)
@@ -88,7 +91,6 @@ export async function handleLoginRequest(req: Request, res: Response): Promise<v
         SET challenge_response = EXCLUDED.challenge_response,
             tstamp = EXCLUDED.tstamp
         `;
-
         await client.query(upsertQuery, [full_nonce, user.id, challengeResponse, currentTime]);
         console.log("Send response to frontend");
         // Send response to frontend

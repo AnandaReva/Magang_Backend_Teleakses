@@ -6,7 +6,6 @@
     "description": "API for handling backend."
   },
   "paths": {
-
     "/get_bot_conversation_history_table": {
       "post": {
         "tags": [
@@ -331,6 +330,108 @@
                   "from_date",
                   "to_date",
                   "date_mode"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with data from the bot conversation topic chart.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message."
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Data returned from the bot conversation topic chart."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Hash not valid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message indicating hash validation failed."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message indicating a server issue or failure to communicate with the backend."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ecwx-session-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Session ID used for tracking the session."
+          },
+          {
+            "name": "ecwx-hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "HMAC-SHA256 hash of the request body using the session secret."
+          }
+        ]
+      }
+    },
+    "/get_bot_conversation": {
+      "post": {
+        "tags": [
+          "Bot Conversation"
+        ],
+        "summary": "Get Bot Conversation",
+        "description": "Handles requests to get the bot conversation.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "job_id": {
+                    "type": "string",
+                    "description": "The date mode for filtering."
+                  }
+                },
+                "required": [
+                  "job_id"
                 ]
               }
             }

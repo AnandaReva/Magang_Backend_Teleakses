@@ -8,7 +8,6 @@ import checkBotOrganization from "../utils/checkBotOrganization";
 dotenv.config();
 export const getBotExecutiveSummary = async (req: Request, res: Response) => {
     console.log("execute method: getBotExecutiveSummary");
-    console.log(`Request Body: ${JSON.stringify(req.body)}`)
     const realBackendURL = process.env.endpoint2 ?? "";
     console.log(`Real Backend URL: ${realBackendURL}`);
     const timeStamp = generateTimestamp();

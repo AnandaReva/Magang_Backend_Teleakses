@@ -5,3 +5,5 @@ Progress:
 - 3 new Bot Conversation endpoints
 - Header hash validation from request, connection to real backend
 - Uniqe user_id field and implement Upsert challenge_response and session
+- Rremove ORM use plain SQL query
+- Connected to real backend and database

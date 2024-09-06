@@ -7,7 +7,6 @@ import checkBotOrganization from "../utils/checkBotOrganization";
 dotenv.config();
 export const getBotConversationTopicChart = async (req: Request, res: Response) => {
     console.log("execute method: getBotConversationTopicChart");
-    console.log(`Request Body: ${JSON.stringify(req.body)}`)
     const timeStamp = generateTimestamp();
     const realBackendURL = process.env.endpoint3 ?? "";
     console.log(`Real backend URL: ${realBackendURL}`);

@@ -9,13 +9,10 @@ const checkJsonMiddleware = (err: any, req: Request, res: Response, next: NextFu
             err.message.includes('Expected'))) {
         const timeStamp = generateTimestamp();
         console.error(`[${timeStamp}] Parsing error:`, err.message);
-
         return res.status(400).json({
             error_code: `error invalid`,
-
         });
     }
     next(err);
 };
-
 export default checkJsonMiddleware;
