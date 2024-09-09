@@ -19,7 +19,6 @@ const getSessionSecret = async (sessionId: string): Promise<string> => {
                 console.error(`Session data with session id = [${sessionId}] not found in database`);
                 return "0";
             }
-
             return result.rows[0].session_secret;
         } finally {
             client.release();
@@ -37,7 +36,10 @@ export const getBotConversation = async (req: Request, res: Response) => {
     const timeStamp = generateTimestamp();
 
     if (!realBackendURL) {
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({
+            error_code: "5000002",
+            error_message: "error, internal server error",
+        });
         console.error(`[${timeStamp}] Backend URL is not defined`);
         return;
     }
@@ -50,7 +52,10 @@ export const getBotConversation = async (req: Request, res: Response) => {
     console.log("Job ID received:", job_id);
 
     if (!sessionId) {
-        res.status(400).json({ error: 'Missing session ID' });
+        res.status(400).json({
+            error_message: "invalid request. invalid field value",
+            error_code: "40000004",
+        });
         console.error(`[${timeStamp}] Session ID not provided`);
         return;
     }
@@ -91,22 +96,30 @@ export const getBotConversation = async (req: Request, res: Response) => {
     console.log(`[${timeStamp}] Forwarding request to backend: ${realBackendURL}`);
 
     try {
+        // Send request to the real backend
         const backendResponse = await fetch(realBackendURL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'ecwx-session-id': sessionId,
-                'ecwx-hash': receivedHash,
+                'ecwx-session-id': req.headers['ecwx-session-id'] as string,
+                'ecwx-hash': req.headers['ecwx-hash'] as string,
             },
             body: JSON.stringify(req.body),
         });
+
+        console.log(`Post body sent to real backend: ${JSON.stringify(req.body)}`);
+
         const responseData = await backendResponse.json();
         const realBackendResStatus = backendResponse.status;
 
         res.status(realBackendResStatus).json(responseData);
-        console.log(`Response from backend: res.status(${realBackendResStatus}).json(${JSON.stringify(responseData)})`);
+        console.log(`Response from real backend: res.status(${realBackendResStatus}).json(${JSON.stringify(responseData)});`);
+        console.log("Send Real Backand Status to FE", realBackendResStatus, "Response Data", responseData);
     } catch (e) {
         console.error(`[${timeStamp}] Error forwarding request to backend: ${e}`);
-        res.status(500).json({ error_code: 'Failed to communicate with backend' });
+        res.status(500).json({
+            error_code: "5000002",
+            error_message: "error, internal server error",
+        });
     }
 };

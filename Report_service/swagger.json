@@ -512,6 +512,507 @@
           }
         ]
       }
+    },
+    "/get_bot_internal_knowledge": {
+      "post": {
+        "tags": [
+          "Bot Knowledge"
+        ],
+        "summary": "Get Bot Internal Knowledge",
+        "description": "Handles requests to get bot internal knowledge, validates request hash, and forwards to the actual backend endpoint.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "bot_id": {
+                    "type": "string",
+                    "description": "The ID of the bot."
+                  }
+                },
+                "required": [
+                  "bot_id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with data from the bot internal knowledge.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message."
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Data returned from the bot internal knowledge."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Hash not valid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error_message": {
+                      "type": "string",
+                      "description": "Error message indicating hash validation failed."
+                    },
+                    "error_code": {
+                      "type": "string",
+                      "description": "Error code for unauthorized access."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Bot ID does not match the organization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error_code": {
+                      "type": "string",
+                      "description": "Error code indicating access is forbidden."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error_code": {
+                      "type": "string",
+                      "description": "Error message indicating a server issue or failure to communicate with the backend."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ecwx-session-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Session ID used for tracking the session."
+          },
+          {
+            "name": "ecwx-hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "HMAC-SHA256 hash of the request body using the session secret."
+          }
+        ]
+      }
+    },
+    "/update_bot_internal_knowledge": {
+      "post": {
+        "tags": [
+          "Bot Knowledge"
+        ],
+        "summary": "Update Bot Internal Knowledge",
+        "description": "Handles requests to update bot internal knowledge, validates request hash, and forwards to the actual backend endpoint.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "bot_id": {
+                    "type": "string",
+                    "description": "The ID of the bot."
+                  },
+                  "child_prompt_id": {
+                    "type": "string",
+                    "description": "The ID of the child prompt to be updated. Can be empty if not applicable."
+                  },
+                  "knowledge_text": {
+                    "type": "string",
+                    "description": "The knowledge text that needs to be updated."
+                  }
+                },
+                "required": [
+                  "bot_id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with confirmation of update.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message indicating the knowledge was updated."
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Data returned from the update action."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Hash not valid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error_message": {
+                      "type": "string",
+                      "description": "Error message indicating hash validation failed."
+                    },
+                    "error_code": {
+                      "type": "string",
+                      "description": "Error code for unauthorized access."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Bot ID does not match the organization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error_code": {
+                      "type": "string",
+                      "description": "Error code indicating access is forbidden."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error_code": {
+                      "type": "string",
+                      "description": "Error message indicating a server issue or failure to communicate with the backend."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ecwx-session-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Session ID used for tracking the session."
+          },
+          {
+            "name": "ecwx-hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "HMAC-SHA256 hash of the request body using the session secret."
+          }
+        ]
+      }
+    },
+    "/get_bot_internal_greeting": {
+      "post": {
+        "tags": [
+          "Bot Knowledge"
+        ],
+        "summary": "Get Bot Internal Greeting",
+        "description": "Handles requests to get bot internal greeting, validates the request hash, checks the bot organization, and forwards the request to the actual backend endpoint.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "bot_id": {
+                    "type": "string",
+                    "description": "The ID of the bot."
+                  }
+                },
+                "required": [
+                  "bot_id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with data from the bot internal greeting.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message."
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Data returned from the bot internal greeting."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Hash not valid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error_message": {
+                      "type": "string",
+                      "description": "Error message indicating hash validation failed."
+                    },
+                    "error_code": {
+                      "type": "string",
+                      "description": "Error code for unauthorized access."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Bot ID does not match the organization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error_code": {
+                      "type": "string",
+                      "description": "Error code indicating access is forbidden."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error_code": {
+                      "type": "string",
+                      "description": "Error message indicating a server issue or failure to communicate with the backend."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ecwx-session-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Session ID used for tracking the session."
+          },
+          {
+            "name": "ecwx-hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "HMAC-SHA256 hash of the request body using the session secret."
+          }
+        ]
+      }
+    },
+    "/update_bot_internal_greeting": {
+      "post": {
+        "tags": [
+          "Bot Knowledge"
+        ],
+        "summary": "Update Bot Internal Greeting",
+        "description": "Handles requests to update the bot internal greeting, validates the request hash, checks the bot organization, and forwards the request to the actual backend endpoint.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "bot_id": {
+                    "type": "string",
+                    "description": "The ID of the bot."
+                  },
+                  "greeting": {
+                    "type": "string",
+                    "description": "The new greeting message to be set for the bot."
+                  }
+                },
+                "required": [
+                  "bot_id",
+                  "greeting"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response indicating the greeting has been updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message."
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Data confirming the greeting update."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Hash not valid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error_message": {
+                      "type": "string",
+                      "description": "Error message indicating hash validation failed."
+                    },
+                    "error_code": {
+                      "type": "string",
+                      "description": "Error code for unauthorized access."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Bot ID does not match the organization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error_code": {
+                      "type": "string",
+                      "description": "Error code indicating access is forbidden."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error_code": {
+                      "type": "string",
+                      "description": "Error message indicating a server issue or failure to communicate with the backend."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ecwx-session-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Session ID used for tracking the session."
+          },
+          {
+            "name": "ecwx-hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "HMAC-SHA256 hash of the request body using the session secret."
+          }
+        ]
+      }
     }
   }
 }

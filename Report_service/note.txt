@@ -11,6 +11,7 @@ npx prisma init
 npm install swagger-ui-express swagger-jsdoc
 npm install --save-dev @types/swagger-ui-express
 npm install connect-timeout
+npm install pg-pool pg
 
 
 npm install
