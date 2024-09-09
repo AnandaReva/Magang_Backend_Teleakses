@@ -55,14 +55,20 @@ export const getBotConversation = async (req: Request, res: Response) => {
         return;
     }
     if (!job_id) {
-        res.status(400).json({ error: 'Missing job ID' });
+        res.status(400).json({
+            error_message: "invalid request. invalid field value",
+            error_code: "40000004",
+        });
         console.error(`[${timeStamp}] Job ID not provided`);
         return;
     }
     const sessionSecret = await getSessionSecret(sessionId);
 
     if (sessionSecret === '0') {
-        res.status(400).json({ error: 'Session secret not found' });
+        res.status(401).json({
+            error_message: "unauthenticated",
+            error_code: "40100001"
+        });
         console.error(`[${timeStamp}] Session secret not found for session ID [${sessionId}]`);
         return;
     }
@@ -74,7 +80,10 @@ export const getBotConversation = async (req: Request, res: Response) => {
     console.log(`Received Hash: [${receivedHash}]`);
 
     if (expectedHash !== receivedHash) {
-        res.status(401).json({ error: 'unauthorize' });
+        res.status(401).json({
+            error_message: "unauthenticated",
+            error_code: "40100001"
+        });
         console.error(`[${timeStamp}] Hash validation failed. Expected: [${expectedHash}], Received: [${receivedHash}]`);
         return;
     }

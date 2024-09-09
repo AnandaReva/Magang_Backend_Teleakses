@@ -5,14 +5,15 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './swagger.json';
 import pool from './db/config';
 import checkJsonMiddleware from './middlewares/checkJsonMiddleware'
-import checkIpMiddleware from './middlewares/checkIpMiddleware';
+import checkIpMiddleware from './middlewares/logRequestMiddleware';
 const app = express();
 
 dotenv.config();
 // middlewares
-app.use(checkIpMiddleware);
-app.use(express.json());
+
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(checkIpMiddleware);
 app.use(checkJsonMiddleware);
 
 

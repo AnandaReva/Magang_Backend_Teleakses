@@ -7,7 +7,7 @@ dotenv.config();
 
 export const getBotConversationHistoryTable = async (req: Request, res: Response) => {
     console.log("Executing method: getBotConversationHistoryTable");
-    
+
     const realBackendURL = process.env.endpoint1 ?? '';
     const timeStamp = generateTimestamp();
     // Check if the URL is defined
@@ -21,7 +21,10 @@ export const getBotConversationHistoryTable = async (req: Request, res: Response
 
     // Check if validation failed
     if (validationResult === "0") {
-        res.status(401).json({ error_code: 'unauthorized' });
+        res.status(401).json({
+            error_message: "unauthenticated",
+            error_code: "40100001"
+        });
         console.error(`[${timeStamp}] Hash validation failed`);
         return;
     }

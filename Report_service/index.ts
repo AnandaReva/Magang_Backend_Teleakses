@@ -2,21 +2,22 @@ import express from 'express';
 import pool from './db/config'
 import dotenv from 'dotenv';
 
-import bodyParser from 'body-parser';
+
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './swagger.json';
 import reportRoutes from './routes/reportRoutes'; 
 import checkJsonMiddleware from './middlewares/checkJsonMiddleware'
-import checkIpMiddleware from './middlewares/checkIpMiddleware';
+import checkIpMiddleware from './middlewares/logRequestMiddleware';
 
 const app = express();
 dotenv.config();
 
 
 // middlewares
-app.use(checkIpMiddleware);
 app.use(express.json());
+
 app.use(express.urlencoded({ extended: true }));
+app.use(checkIpMiddleware);
 app.use(checkJsonMiddleware);
 
 

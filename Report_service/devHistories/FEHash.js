@@ -2,7 +2,7 @@ const CryptoJS = require('crypto-js');
 
 
 //const session_secret = 'gOFhhf39yBnWdtBVZc2LAsHnFonLFUaFD92CUhonvrg='; 
-const session_secret = 'Xopznz7u5j+gOSb6EPshATB9A+zihAmFyUa6Xt8g2AI=';
+const session_secret = 'p4vo7XOTGNhdtowg3u2g9vQPTKpoHvVpGNgmLvXVrGw=';
 //api 1
 // const parameters = {
 //     data: {
@@ -31,21 +31,21 @@ const session_secret = 'Xopznz7u5j+gOSb6EPshATB9A+zihAmFyUa6Xt8g2AI=';
 // };
 
 //api3
-const parameters = {
-    data: {
-        bot_id: "1"
-    },
-    from_date: 0,
-    to_date: 0,
-    search_filter: "string",
-    date_mode: 0
-};
+// const parameters = {
+//     data: {
+//         bot_id: "1"
+//     },
+//     from_date: 0,
+//     to_date: 0,
+//     search_filter: "string",
+//     date_mode: 0
+// };
 
 //api4
 
-// const parameters = {
-//     job_id: "1725331930-c25c0600518e422c8a6ce2ee51998089"
-// };
+const parameters = {
+    job_id: "1725331930-c25c0600518e422c8a6ce2ee51998089"
+};
 
 
 

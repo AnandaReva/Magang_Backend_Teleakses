@@ -9,13 +9,14 @@ import calculateChallengeResponse from "../utils/calculateChallengeResponse";
 
 
 
+
+
 // Updated handleLoginRequest function with explicit schema references
 export async function handleLoginRequest(req: Request, res: Response): Promise<void> {
     console.log("execute method: handleLoginRequest");
     console.log(`Request Body: ${JSON.stringify(req.body)}`)
     const timestamp = generateTimestamp();
     const client = await pool.connect();
-
     try {
         const { username, half_nonce } = req.body;
 
@@ -25,39 +26,36 @@ export async function handleLoginRequest(req: Request, res: Response): Promise<v
         if (!half_nonce) missingFields.push('half_nonce');
 
         if (missingFields.length > 0) {
-            res.status(401).json({
-                error: "unauthenticated",
+            res.status(400).json({
+                error_message: "invalid request. invalid field value",
+                error_code: "40000004",
             });
-            console.error(`[${timestamp}] res.status(401).json: { error: "Invalid input", missingFields: ${JSON.stringify(missingFields)} }, \nrequest sent: ${JSON.stringify(req.body)}`);
+            console.error(`[${timestamp}] res.status(400).json: { error: "Invalid input", missingFields: ${JSON.stringify(missingFields)} }, \nrequest sent: ${JSON.stringify(req.body)}`);
             return;
         }
-
         if (half_nonce.length !== 8) {
-            res.status(401).json({
-                error: "unauthenticated",
+            res.status(400).json({
+                error_message: "invalid request. invalid field value",
+                error_code: "40000004",
             });
-            console.error(`[${timestamp}] res.status(401).json: { error: "Invalid input", message: "half_nonce must be 8 characters long" }`);
+            console.error(`[${timestamp}] res.status(400).json: { error: "Invalid input", message: "half_nonce must be 8 characters long" }`);
             return;
         }
-
         const userQuery = 'SELECT id, salt, saltedpassword FROM servouser.user WHERE username = $1';
         const userResult = await client.query(userQuery, [username]);
-
         // faking data 
         if (userResult.rowCount === 0) {
             const fakeFullNone = half_nonce + generateRandomString(8);
             const fakeSalt = generateRandomString(8);
-            console.log("--username incorrect: \n generating fake data: " , " Fake full_nonce: ",  fakeFullNone , "Fake salt:"  ,fakeSalt)
-            res.status(401).json({
+            console.log("--username incorrect: \n generating fake data: ", " Fake full_nonce: ", fakeFullNone, "Fake salt:", fakeSalt)
+            res.json({
                 full_nonce: fakeFullNone,
                 salt: fakeSalt,
             });
             console.error(`[${timestamp}] res.status(401).json: { timeStamp: "${timestamp}", message: "User not found" }`, { "username sent:": username });
             return;
         }
-
         const user = userResult.rows[0];
-
         // Check if there's an existing challenge for the user
         const challengeQuery = 'SELECT * FROM servouser.challenge_response WHERE user_id = $1';
         const challengeResult = await client.query(challengeQuery, [user.id.toString()]);
@@ -75,7 +73,6 @@ export async function handleLoginRequest(req: Request, res: Response): Promise<v
                 return;
             }
         }
-
         // Generate nonce1
         const nonce1 = generateRandomString(8);
         const full_nonce = `${half_nonce}${nonce1}`;
@@ -91,6 +88,7 @@ export async function handleLoginRequest(req: Request, res: Response): Promise<v
         SET challenge_response = EXCLUDED.challenge_response,
             tstamp = EXCLUDED.tstamp
         `;
+        console.log("Query to upsert challenge Reposnse: " , upsertQuery);
         await client.query(upsertQuery, [full_nonce, user.id, challengeResponse, currentTime]);
         console.log("Send response to frontend");
         // Send response to frontend
