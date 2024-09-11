@@ -24,7 +24,7 @@ export const getBotExecutiveSummary = async (req: Request, res: Response) => {
     if (validationResult === "0") {
         res.status(401).json({
             error_message: "unauthenticated",
-            error_code: "40100001"
+            error_code: "40100021"
         });
         console.error(`[${timeStamp}] Hash validation failed`);
         return;
@@ -38,7 +38,10 @@ export const getBotExecutiveSummary = async (req: Request, res: Response) => {
     // Check if the bot organization is valid
     const isOrganization = await checkBotOrganization(botId, userId, organizationId);
     if (!isOrganization) {
-        res.status(403).json({ error_code: 'forbidden' });
+        res.status(403).json({
+            error_code: "4030021",
+            error_message: "forbidden",
+        });
         console.error(`[${timeStamp}] Response sent: res.status(403).json({ error_code: "forbidden", message: "Bot ID does not match organization ID" });`);
         return;
     }
@@ -58,7 +61,6 @@ export const getBotExecutiveSummary = async (req: Request, res: Response) => {
         });
 
         console.log(`Post body sent to real backend: ${JSON.stringify(req.body)}`);
-
         const responseData = await backendResponse.json();
         const realBackendResStatus = backendResponse.status;
 
@@ -68,7 +70,7 @@ export const getBotExecutiveSummary = async (req: Request, res: Response) => {
     } catch (e) {
         console.error(`[${timeStamp}] Error forwarding request to backend: ${e}`);
         res.status(500).json({
-            error_code: "5000002",
+            error_code: "5000021",
             error_message: "error, internal server error",
         });
     }

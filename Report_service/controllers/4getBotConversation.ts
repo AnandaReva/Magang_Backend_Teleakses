@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import createHMACSHA256Hash from "../utils/createHMACSHA256Hash";
+import { createHMACSHA256HashBase64} from "../utils/createHMACSHA256Hash";
 import dotenv from 'dotenv';
 import generateTimestamp from '../utils/generateTimeStamp';
 import pool from '../db/config';
@@ -31,10 +31,8 @@ const getSessionSecret = async (sessionId: string): Promise<string> => {
 
 export const getBotConversation = async (req: Request, res: Response) => {
     console.log("Executing method: getBotConversation");
-
     const realBackendURL = process.env.endpoint4 ?? "";
     const timeStamp = generateTimestamp();
-
     if (!realBackendURL) {
         res.status(500).json({
             error_code: "5000002",
@@ -72,12 +70,12 @@ export const getBotConversation = async (req: Request, res: Response) => {
     if (sessionSecret === '0') {
         res.status(401).json({
             error_message: "unauthenticated",
-            error_code: "40100001"
+            error_code: "40100041"
         });
         console.error(`[${timeStamp}] Session secret not found for session ID [${sessionId}]`);
         return;
     }
-    const expectedHash = createHMACSHA256Hash(job_id, sessionSecret);
+    const expectedHash = createHMACSHA256HashBase64(job_id, sessionSecret);
     console.log("Job ID:", job_id, 'Session Secret:', sessionSecret);
     const receivedHash = req.headers['ecwx-hash'] as string || '';
 
@@ -87,7 +85,7 @@ export const getBotConversation = async (req: Request, res: Response) => {
     if (expectedHash !== receivedHash) {
         res.status(401).json({
             error_message: "unauthenticated",
-            error_code: "40100001"
+            error_code: "40100041"
         });
         console.error(`[${timeStamp}] Hash validation failed. Expected: [${expectedHash}], Received: [${receivedHash}]`);
         return;
@@ -108,17 +106,15 @@ export const getBotConversation = async (req: Request, res: Response) => {
         });
 
         console.log(`Post body sent to real backend: ${JSON.stringify(req.body)}`);
-
         const responseData = await backendResponse.json();
         const realBackendResStatus = backendResponse.status;
-
         res.status(realBackendResStatus).json(responseData);
         console.log(`Response from real backend: res.status(${realBackendResStatus}).json(${JSON.stringify(responseData)});`);
         console.log("Send Real Backand Status to FE", realBackendResStatus, "Response Data", responseData);
     } catch (e) {
         console.error(`[${timeStamp}] Error forwarding request to backend: ${e}`);
         res.status(500).json({
-            error_code: "5000002",
+            error_code: "5000041",
             error_message: "error, internal server error",
         });
     }

@@ -1,7 +1,7 @@
 
 import { Request, Response } from "express";
 import generateTimestamp from "../utils/generateTimeStamp";
-import createHMACSHA256Hash from "../utils/createHMACSHA256Hash";
+import { createHMACSHA256HashBase64, createHMACSHA256HashHex } from "../utils/createHMACSHA256Hash";
 import generateRandomString from "../utils/generateRandomString";
 import calculateChallengeResponse from "../utils/calculateChallengeResponse";
 import pool from '../db/config'
@@ -24,41 +24,6 @@ async function deleteChallengeResponse(full_nonce: string): Promise<void> {
     }
 }
 
-// async function getUserRole(userId: number): Promise<string | null> {
-//     try {
-//         const getRoleQuery = 'SELECT role FROM servouser.user WHERE id = $1 LIMIT 1';
-//         const roleResult = await pool.query(getRoleQuery, [userId]);
-//         if (roleResult.rows.length > 0) {
-//             return roleResult.rows[0].role;
-//         } else {
-//             console.log("No role found for user ID:", userId);
-//             return null;
-//         }
-//     } catch (error) {
-//         console.error("Error retrieving user role:", error);
-//         return null;
-//     }
-// }
-
-// async function getPrivilegesByRole(role: string): Promise<string> {
-//     try {
-//         const getPrivilegesQuery = 'SELECT privileges FROM servouser.role WHERE name = $1 LIMIT 1';
-//         const privilegesResult = await pool.query(getPrivilegesQuery, [role]);
-//         if (privilegesResult.rows.length > 0) {
-//             const privileges = privilegesResult.rows[0].privileges;
-//             console.log("Privileges: ", privileges);
-//             return privileges;
-//         } else {
-//             console.log("No privileges found for the role:", role);
-//             return "0";
-//         }
-//     } catch (err) {
-//         console.error("Error retrieving privileges:", err);
-//         return "0";
-//     }
-// }
-
-
 async function getUserPrivileges(userId: number): Promise<string> {
     console.log("Executing method: getUserPrivileges");
     try {
@@ -72,12 +37,12 @@ async function getUserPrivileges(userId: number): Promise<string> {
         }
         const role = roleResult.rows[0].role;
         console.log("userId: ", userId)
-        console.log("role from db servouser.user:", role )
+        console.log("role from db servouser.user:", role)
         // Get privileges from role
         const getPrivilegesQuery = 'SELECT privileges FROM servouser.role WHERE name = $1 LIMIT 1';
         console.log("get privilages query:", getPrivilegesQuery);
         const privilegesResult = await pool.query(getPrivilegesQuery, [role]);
-        
+
         if (privilegesResult.rows.length === 0) {
             console.log("No privileges found for the role:", role);
             return "0";
@@ -86,10 +51,37 @@ async function getUserPrivileges(userId: number): Promise<string> {
         console.log("role: ", role)
         console.log("privileges from db servouser.role: ", privileges);
         return privileges;
-
     } catch (error) {
         console.error("Error retrieving user privileges:", error);
         return "0";
+    }
+}
+
+async function upsertSession(session_id: string, user_id: string, session_secret: string) {
+    console.log("Executing method: upsertSession");
+
+    const queryUpsertSession = `
+        INSERT INTO servouser.session (session_id, user_id, session_secret, tstamp, st)
+        VALUES ($1, $2, $3, $4, $5)
+        ON CONFLICT (user_id) DO UPDATE
+        SET session_id = EXCLUDED.session_id,
+            session_secret = EXCLUDED.session_secret,
+            tstamp = EXCLUDED.tstamp,
+            st = EXCLUDED.st
+    `;
+    try {
+        await pool.query(queryUpsertSession, [
+            session_id,
+            user_id,
+            session_secret,
+            Math.floor(Date.now() / 1000),
+            1,
+        ]);
+        console.log("Session upserted successfully.");
+        return "success";
+    } catch (upsertError) {
+        console.error(`Error during upsert session: `, upsertError);
+        throw new Error("Error updating session.");
     }
 }
 
@@ -111,7 +103,7 @@ export async function handleChallengeResponseVerification(
         if (missingFields.length > 0) {
             res.status(400).json({
                 error_message: "invalid request. invalid field value",
-                error_code: "40000004",
+                error_code: "40000001",
             });
             console.error(
                 `[${timestamp}] res.status(400).json: Missing fields:`,
@@ -123,7 +115,7 @@ export async function handleChallengeResponseVerification(
         if (full_nonce.length != 16) {
             res.status(400).json({
                 error_message: "invalid request. invalid field value",
-                error_code: "40000004",
+                error_code: "40000002",
             });
             console.error(
                 `[${timestamp}] res.status(400).json full_nonce must 16 characters length.`,
@@ -142,7 +134,7 @@ export async function handleChallengeResponseVerification(
         if (challengeDataResult.rowCount === 0) {
             res.status(401).json({
                 error_message: "unauthenticated",
-                error_code: "40100001"
+                error_code: "40100003"
             });
             console.error(
                 `[${timestamp}] res.status(401).json: { error: "Challenge not valid", message: "The challenge provided is not valid. Please ensure that the full_nonce is correct." }`
@@ -159,11 +151,11 @@ export async function handleChallengeResponseVerification(
             console.log("\n ------Challenge response exceeds 60 seconds, deleting challenge reponse")
             res.status(401).json({
                 error_message: "unauthenticated",
-                error_code: "40100001"
+                error_code: "40100004"
             });
             await deleteChallengeResponse(full_nonce);
             console.error(
-                `[${timestamp}] res.status(400).json: { message: "Challenge has expired" }`,
+                `[${timestamp}] res.status(401).json: { message: "Challenge has expired" }`,
                 ` \nrequest sent: ${JSON.stringify(req.body)}`
             );
             return;
@@ -181,13 +173,15 @@ export async function handleChallengeResponseVerification(
             "\n -------------"
         );
 
+
+        // Cek if challenge response is valid
         if (isValid) {
             // Generate session id - 16 random alphanumeric lowercase characters
             const session_id = generateRandomString(16);
             // Generate nonce2 = 8 random alphanumeric lowercase characters
             const nonce2 = generateRandomString(8);
             // session secret = hmac-sha256(key=salted password, message = full nonce + nonce2)
-            const session_secret = createHMACSHA256Hash(
+            const session_secret = createHMACSHA256HashHex(
                 `${full_nonce}${nonce2}`,
                 challengeData.saltedpassword
             );
@@ -199,29 +193,10 @@ export async function handleChallengeResponseVerification(
             console.log(`[  nonce2: ${nonce2} ]`);
             console.log(`[  session_secret: ${session_secret}]`);
 
-            const queryUpsertSession = `INSERT INTO servouser.session (session_id, user_id, session_secret, tstamp, st)
-            VALUES ($1, $2, $3, $4, $5)
-            ON CONFLICT (user_id) DO UPDATE
-            SET session_id = EXCLUDED.session_id,
-                session_secret = EXCLUDED.session_secret,
-                tstamp = EXCLUDED.tstamp,
-                st = EXCLUDED.st`
-            const result = await pool.query(queryUpsertSession, [
-                session_id,
-                challengeData.user_id,
-                session_secret,
-                Math.floor(Date.now() / 1000),
-                1,
-            ]);
+            // Do upsert query
+            await upsertSession(session_id, challengeData.user_id, session_secret);
 
-
-            // Get role and privileges
-            // const userRole = await getUserRole(challengeData.user_id);
-            // let privileges = "0";
-            // if (userRole) {
-            //     privileges = await getPrivilegesByRole(userRole);
-            // }
-
+            // get user pivilage
             const privileges = await getUserPrivileges(challengeData.user_id)
 
             res.status(200).json({
@@ -232,10 +207,19 @@ export async function handleChallengeResponseVerification(
                     privileges,
                 },
             });
+            console.log("res.status(200).json(", JSON.stringify({
+                session_id,
+                nonce2,
+                user_data: {
+                    full_name: challengeData.full_name,
+                    privileges,
+                },
+            }), ");");
+
         } else {
             res.status(401).json({
                 error_message: "unauthenticated",
-                error_code: "40100001"
+                error_code: "40100005"
             });
             console.error(
                 `[${timestamp}] res.status(401).json: { timeStamp: "${timestamp}", message: "Invalid challenge response" }`,
@@ -244,9 +228,7 @@ export async function handleChallengeResponseVerification(
         }
         await deleteChallengeResponse(full_nonce);
     } catch (e) {
-        res.status(500).json({
-            error: "internal server error",
-        });
+        res.status(500).json({ error_code: "50000001", error_message: "Internal server Error" });
         console.error(
             `[${timestamp}] Error during verifying challenge response: { error: "internal server error", details: "${e}" }`,
             ` \nrequest sent: ${JSON.stringify(req.body)}`

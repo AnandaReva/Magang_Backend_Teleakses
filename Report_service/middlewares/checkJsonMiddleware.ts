@@ -22,11 +22,11 @@ export default function checkJsonMiddleware(err: any, req: Request, res: Respons
         console.log(
             `res.status(400).json:`, {
             error_message: "invalid request. Not JSON",
-            error_code: "40000001",
+            error_code: "40000000",
         });
         return res.status(400).json({
             error_message: "invalid request. Not JSON",
-            error_code: "40000001",
+            error_code: "40000000",
         });
     }
     next(err);

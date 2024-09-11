@@ -1,3 +1,4 @@
+//utils/generateRandomString.ts
 export default function generateRandomString(length: number): string {
     console.log("execute method: generateRandomString");
     const charset = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -7,5 +8,6 @@ export default function generateRandomString(length: number): string {
         result += charset[randomIndex];
     }
     console.log("result:", result);
+    console.log("coba:", result);
     return result;
 }

@@ -1,17 +1,14 @@
 import pool from '../db/config';
+import generateTimestamp from './generateTimeStamp';
 
 export default async function checkBotOrganization(botId: string, userId: string, organizationId: string): Promise<boolean> {
-    const timeStamp = new Date().toISOString();
+    const timeStamp = generateTimestamp;
     console.log('Executing method: checkBotOrganization');
 
-    const client = await pool.connect();
-
     try {
-        
         const query = 'SELECT id, organization_id FROM servobot2.main_prompt WHERE id = $1 AND organization_id = $2';
         console.log("Query to find bot id and organization: " + query);
-
-        const result = await client.query(query, [botId, organizationId]);
+        const result = await pool.query(query, [botId, organizationId]);
         console.log(`Query result: ${JSON.stringify(result.rows)}`);
 
         if (result.rowCount === 0) {
@@ -25,12 +22,9 @@ export default async function checkBotOrganization(botId: string, userId: string
             console.error(`[${timeStamp}] Organization Id does not match: User ID [${userId}], organization id ID [${row.organization_id}]`);
             return false;
         }
-
         return true;
     } catch (error) {
         console.error(`[${timeStamp}] Error in checkBotOrganization:`, error);
         return false;
-    } finally {
-        client.release();
     }
 }

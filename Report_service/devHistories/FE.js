@@ -2,7 +2,7 @@ const CryptoJS = require('crypto-js');
 
 
 //const session_secret = 'gOFhhf39yBnWdtBVZc2LAsHnFonLFUaFD92CUhonvrg='; 
-const session_secret = 'hQFNRTkJF7cD0Yvk+oWpIeZgkAM5efISK8KekJYDPos=';
+const session_secret = '26a29782bf28728cdf4aa216ebd5190fa45b8cce1d77bca5f472a3d76b61dd9a';
 //api 1
 // const parameters = {
 //     data: {
@@ -28,7 +28,7 @@ const session_secret = 'hQFNRTkJF7cD0Yvk+oWpIeZgkAM5efISK8KekJYDPos=';
 //     to_date: 0,
 //     date_mode: 0
 
-// };
+//  };
 
 //api3
 // const parameters = {
@@ -48,9 +48,9 @@ const session_secret = 'hQFNRTkJF7cD0Yvk+oWpIeZgkAM5efISK8KekJYDPos=';
 // };
 
 //api5
-const parameters = {
-    bot_id: "1"
-};
+// const parameters = {
+//     bot_id: "1"
+// };
 
 
 //api6
@@ -61,9 +61,9 @@ const parameters = {
 // };
 
 //api 7
-// const parameters = {
-//     bot_id: "1"
-// };
+const parameters = {
+    bot_id: "1"
+};
 
 
 //api 8
@@ -71,12 +71,6 @@ const parameters = {
 //     bot_id: "1",
 //     greeting: ""
 // };
-
-
-
-
-
-
 
 
 
@@ -106,6 +100,4 @@ function generateHmac(message, key, notif) {
         return null;
     }
 }
-
-
 console.log("Hashed Body:", hashed_body);

@@ -11,7 +11,7 @@
         "tags": [
           "Bot Conversation"
         ],
-        "summary": "Get Bot Conversation History Table",
+        "summary": "1. Get Bot Conversation History Table",
         "description": "Handles requests to get bot conversation history table, validates request hash, and forwards to the actual backend endpoint.",
         "requestBody": {
           "required": true,
@@ -162,7 +162,7 @@
         "tags": [
           "Bot Conversation"
         ],
-        "summary": "Get Bot Executive Summary",
+        "summary": "2. Get Bot Executive Summary",
         "description": "Handles requests to get the bot executive summary, validates request hash, and forwards to the actual backend endpoint.",
         "requestBody": {
           "required": true,
@@ -287,7 +287,7 @@
         "tags": [
           "Bot Conversation"
         ],
-        "summary": "Get Bot Conversation Topic Chart",
+        "summary": "3. Get Bot Conversation Topic Chart",
         "description": "Handles requests to get the bot conversation topic chart, validates request hash, and forwards to the actual backend endpoint.",
         "requestBody": {
           "required": true,
@@ -416,7 +416,7 @@
         "tags": [
           "Bot Conversation"
         ],
-        "summary": "Get Bot Conversation",
+        "summary": "4. Get Bot Conversation",
         "description": "Handles requests to get the bot conversation.",
         "requestBody": {
           "required": true,
@@ -516,9 +516,9 @@
     "/get_bot_internal_knowledge": {
       "post": {
         "tags": [
-          "Bot Knowledge"
+          "Bot Internal"
         ],
-        "summary": "Get Bot Internal Knowledge",
+        "summary": "5. Get Bot Internal Knowledge",
         "description": "Handles requests to get bot internal knowledge, validates request hash, and forwards to the actual backend endpoint.",
         "requestBody": {
           "required": true,
@@ -638,9 +638,9 @@
     "/update_bot_internal_knowledge": {
       "post": {
         "tags": [
-          "Bot Knowledge"
+          "Bot Internal"
         ],
-        "summary": "Update Bot Internal Knowledge",
+        "summary": "6. Update Bot Internal Knowledge",
         "description": "Handles requests to update bot internal knowledge, validates request hash, and forwards to the actual backend endpoint.",
         "requestBody": {
           "required": true,
@@ -768,9 +768,9 @@
     "/get_bot_internal_greeting": {
       "post": {
         "tags": [
-          "Bot Knowledge"
+          "Bot Internal"
         ],
-        "summary": "Get Bot Internal Greeting",
+        "summary": "7. Get Bot Internal Greeting",
         "description": "Handles requests to get bot internal greeting, validates the request hash, checks the bot organization, and forwards the request to the actual backend endpoint.",
         "requestBody": {
           "required": true,
@@ -890,9 +890,9 @@
     "/update_bot_internal_greeting": {
       "post": {
         "tags": [
-          "Bot Knowledge"
+          "Bot Internal"
         ],
-        "summary": "Update Bot Internal Greeting",
+        "summary": "8. Update Bot Internal Greeting",
         "description": "Handles requests to update the bot internal greeting, validates the request hash, checks the bot organization, and forwards the request to the actual backend endpoint.",
         "requestBody": {
           "required": true,
