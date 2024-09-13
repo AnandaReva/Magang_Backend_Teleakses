@@ -1,11 +1,17 @@
-import {createHMACSHA256HashBase64} from "./createHMACSHA256Hash";
+import { createHMACSHA256HashBase64 } from "./createHMACSHA256Hash";
+import log from './logHelper';
+import { globalVar } from './globalVar';
+
+
 export default function calculateChallengeResponse(full_nonce: string, salted_password: string): string {
-    console.log("Executing method: calculateChallengeResponse");
-    console.log(`[Full Nonce: ${full_nonce}]`);
-    console.log(`[Salted Password: ${salted_password}]`);
+    const referenceId = globalVar.getReferenceId();
+
+    log(referenceId, "Executing method: calculateChallengeResponse");
+    log(referenceId, `Full Nonce: ${full_nonce}`);
+    log(referenceId, `Salted Password: ${salted_password}`);
+
     const challengeResponse = createHMACSHA256HashBase64(full_nonce, salted_password);
-    console.log("[Challenge Response generated: ", challengeResponse, "] \n ----------------");
-//    console.log("coba1")
+    log(referenceId, "Challenge Response generated:", challengeResponse);
     return challengeResponse;
 }
 

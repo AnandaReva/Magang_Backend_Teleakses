@@ -44,8 +44,6 @@ const parameters = {
 
 
 console.log('Parameters:', parameters);
-
-
 const parameters_json = JSON.stringify(parameters);
 console.log("Serialized Parameters:", parameters_json);
 console.log("Session Secret:", session_secret);

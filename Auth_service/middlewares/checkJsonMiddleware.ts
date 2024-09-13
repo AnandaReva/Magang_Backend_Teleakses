@@ -1,26 +1,33 @@
 import { Request, Response, NextFunction } from 'express';
-import generateTimestamp from '../utils/generateTimeStamp';
+import { globalVar } from '../utils/globalVar';
+import generateRandomString from '../utils/generateRandomString';
+import log from '../utils/logHelper';
 
 export default function checkJsonMiddleware(err: any, req: Request, res: Response, next: NextFunction) {
-    const timeStamp = generateTimestamp();
-    console.log("execute middleware checkJsonMiddleware");
-    const ipAddress = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    console.log('\n', '------------------------------------------');
-    console.log(`[${timeStamp}] Incoming request from IP: ${ipAddress}`);
-    console.log(`Request details: curl -X ${req.method} ${req.url} \\
-    -H "Content-Type: ${req.headers['content-type']}" \\
-    -H "Authorization: ${req.headers['authorization'] || 'N/A'}" \\
-    -d '${JSON.stringify(req.body)}'`);
+    // Generate a unique reference ID for logging
+    const referenceId = generateRandomString(6);
+    globalVar.setReferenceId(referenceId);
 
-    // Check for JSON syntax error
+    // Extract request details
+    const { method, url, headers, body } = req;
+    const ipAddress = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
+    // Log incoming request details
+    log(referenceId, "Executing middleware: checkJsonMiddleware");
+    log(referenceId, `Incoming request from IP: ${ipAddress}`);
+    log(referenceId, `Request details: curl -X ${method} ${url} \\`);
+    log(referenceId, `-H "Content-Type: ${headers['content-type']}" \\`);
+    log(referenceId, `-H "Authorization: ${headers['authorization'] || 'N/A'}" \\`);
+    log(referenceId, `-d '${JSON.stringify(body)}'`);
+
+    // Check for JSON syntax errors
     if (err instanceof SyntaxError && (
         err.message.match(/Unexpected token/) ||
         err.message.match(/SyntaxError/) ||
         err.message.match(/Expected/)
     )) {
-        console.error(`JSON Parsing error: ${err.message}`);
-        console.log(
-            `res.status(400).json:`, {
+        log(referenceId, `JSON Parsing error: ${err.message}`);
+        log(referenceId, `res.status(400).json:`, {
             error_message: "invalid request. Not JSON",
             error_code: "40000001",
         });
@@ -29,5 +36,7 @@ export default function checkJsonMiddleware(err: any, req: Request, res: Respons
             error_code: "40000001",
         });
     }
+
+    // Continue to the next middleware or route handler
     next(err);
 };

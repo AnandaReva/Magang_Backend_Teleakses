@@ -2,75 +2,75 @@ const CryptoJS = require('crypto-js');
 
 
 //const session_secret = 'gOFhhf39yBnWdtBVZc2LAsHnFonLFUaFD92CUhonvrg='; 
-const session_secret = '26a29782bf28728cdf4aa216ebd5190fa45b8cce1d77bca5f472a3d76b61dd9a';
+const session_secret = '01912193a7f77835841d6bad9f758da8da96a45d136153e75364c04c52a9b04f';
 //api 1
-// const parameters = {
-//     data: {
-//         row_length: 0,
-//         page: 0,
-//         sort_column: 0,
-//         direction: "desc",
-//         bot_id: "1"
-//     },
-//     from_date: 0,
-//     to_date: 0,
-//     search_filter: "string",
-//     date_mode: 0
-// };
+/* const parameters = {
+    data: {
+        row_length: 0,
+        page: 0,
+        sort_column: 0,
+        direction: "desc",
+        bot_id: "1"
+    },
+    from_date: 0,
+    to_date: 0,
+    search_filter: "string",
+    date_mode: 0
+}; */
 
 //api 2
-// const parameters = {
+/* const parameters = {
 
-//     data: {
-//         bot_id: "1"
-//     },
-//     from_date: 0,
-//     to_date: 0,
-//     date_mode: 0
+    data: {
+        bot_id: "1"
+    },
+    from_date: 0,
+    to_date: 0,
+    date_mode: 0
 
-//  };
+}; */
 
 //api3
-// const parameters = {
-//     data: {
-//         bot_id: "1"
-//     },
-//     from_date: 0,
-//     to_date: 0,
-//     search_filter: "string",
-//     date_mode: 0
-// };
-
+/* const parameters = {
+    data: {
+        bot_id: "1"
+    },
+    from_date: 0,
+    to_date: 0,
+    search_filter: "string",
+    date_mode: 0
+};
+ */
 //api4
 
-// const parameters = {
-//     job_id: "1725331930-c25c0600518e422c8a6ce2ee51998089"
-// };
+/* const parameters = {
+    job_id: "1725331930-c25c0600518e422c8a6ce2ee51998089"
+}; */
 
 //api5
-// const parameters = {
-//     bot_id: "1"
-// };
-
-
-//api6
-// const parameters = {
-//     bot_id: "1",
-//     child_prompt_id: "2",
-//     knowledge_text: ""
-// };
-
-//api 7
-const parameters = {
+/* const parameters = {
     bot_id: "1"
 };
+ */
+
+//api6
+/* const parameters = {
+    bot_id: "1",
+    child_prompt_id: "string",
+    knowledge_text: ""
+}; */
+
+//api 7
+/* const parameters = {
+    bot_id: "1"
+}; */
 
 
 //api 8
-// const parameters = {
-//     bot_id: "1",
-//     greeting: ""
-// };
+const parameters = {
+    bot_id: "1",
+    greeting: ""
+};
 
 
 

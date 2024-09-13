@@ -1,61 +1,63 @@
 
 import { Request, Response } from "express";
-import generateTimestamp from "../utils/generateTimeStamp";
+import log from '../utils/logHelper';
+import { globalVar } from '../utils/globalVar';
 import { createHMACSHA256HashBase64, createHMACSHA256HashHex } from "../utils/createHMACSHA256Hash";
 import generateRandomString from "../utils/generateRandomString";
 import calculateChallengeResponse from "../utils/calculateChallengeResponse";
 import pool from '../db/config'
 
 async function deleteChallengeResponse(full_nonce: string): Promise<void> {
+    const referenceId = globalVar.getReferenceId() || 'undefined';
     try {
-        console.log("Executing method: deleteChallengeResponse");
-        console.log("Full nonce: ", full_nonce);
+        log(referenceId, "Executing method: deleteChallengeResponse");
+        log(referenceId, "Full nonce:", full_nonce);
         const deleteQuery = "DELETE FROM servouser.challenge_response WHERE full_nonce = $1 RETURNING *";
-        console.log("Delete Challenge Response Query: ", deleteQuery);
+        log(referenceId, "Delete Challenge Response Query:", deleteQuery);
         const { rowCount, rows } = await pool.query(deleteQuery, [full_nonce]);
         if (rowCount === 0) {
-            console.error("No challenge response found for deletion with full_nonce:", full_nonce);
+            log(referenceId, "No challenge response found for deletion with full_nonce:", full_nonce);
         } else {
-            console.log("Challenge response successfully deleted for full_nonce:", full_nonce);
-            console.log("Deleted row(s):", rows);
+            log(referenceId, "Challenge response successfully deleted for full_nonce:", full_nonce);
+            log(referenceId, "Deleted row(s):", rows);
         }
     } catch (error) {
-        console.error("Failed to delete challenge response:", error);
+        log(referenceId, "Failed to delete challenge response:", error);
     }
 }
 
 async function getUserPrivileges(userId: number): Promise<string> {
-    console.log("Executing method: getUserPrivileges");
+    const referenceId = globalVar.getReferenceId() || 'undefined';
+    log(referenceId, "Executing method: getUserPrivileges");
     try {
-        //get role from user
         const getRoleQuery = 'SELECT role FROM servouser.user WHERE id = $1 LIMIT 1';
-        console.log("get role query:", getRoleQuery);
+        log(referenceId, "Get role query:", getRoleQuery);
         const roleResult = await pool.query(getRoleQuery, [userId]);
         if (roleResult.rows.length === 0) {
-            console.log("No role found for user ID:", userId);
+            log(referenceId, "No role found for user ID:", userId);
             return "0";
         }
         const role = roleResult.rows[0].role;
-        console.log("userId: ", userId)
-        console.log("role from db servouser.user:", role)
-        // Get privileges from role
+        log(referenceId, "userId:", userId);
+        log(referenceId, "Role from db servouser.user:", role);
         const getPrivilegesQuery = 'SELECT privileges FROM servouser.role WHERE name = $1 LIMIT 1';
-        console.log("get privilages query:", getPrivilegesQuery);
+        log(referenceId, "Get privileges query:", getPrivilegesQuery);
         const privilegesResult = await pool.query(getPrivilegesQuery, [role]);
 
         if (privilegesResult.rows.length === 0) {
-            console.log("No privileges found for the role:", role);
+            log(referenceId, "No privileges found for the role:", role);
             return "0";
         }
         const privileges = privilegesResult.rows[0].privileges;
-        console.log("role: ", role)
-        console.log("privileges from db servouser.role: ", privileges);
+        log(referenceId, "Role:", role);
+        log(referenceId, "Privileges from db servouser.role:", privileges);
         return privileges;
     } catch (error) {
-        console.error("Error retrieving user privileges:", error);
+        log(referenceId, "Error retrieving user privileges:", error);
         return "0";
     }
 }
+
 
 async function upsertSession(session_id: string, user_id: string, session_secret: string) {
     console.log("Executing method: upsertSession");
@@ -85,14 +87,14 @@ async function upsertSession(session_id: string, user_id: string, session_secret
     }
 }
 
-
 export async function handleChallengeResponseVerification(
     req: Request,
     res: Response
 ): Promise<void> {
-    console.log("execute method: handleChallengeResponseVerification");
-    console.log(`Request Body: ${JSON.stringify(req.body)}`)
-    const timestamp = generateTimestamp();
+    const referenceId = globalVar.getReferenceId() || 'undefined';
+    log(referenceId, "Execute method: handleChallengeResponseVerification");
+    log(referenceId, `Request Body: ${JSON.stringify(req.body)}`);
+
     try {
         const { full_nonce, challenge_response } = req.body;
 
@@ -102,25 +104,19 @@ export async function handleChallengeResponseVerification(
 
         if (missingFields.length > 0) {
             res.status(400).json({
-                error_message: "invalid request. invalid field value",
+                error_message: "invalid request",
                 error_code: "40000001",
             });
-            console.error(
-                `[${timestamp}] res.status(400).json: Missing fields:`,
-                missingFields
-            );
+            log(referenceId, `res.status(400).json: Missing fields:`, missingFields);
             return;
         }
 
         if (full_nonce.length != 16) {
             res.status(400).json({
-                error_message: "invalid request. invalid field value",
+                error_message: "invalid request",
                 error_code: "40000002",
             });
-            console.error(
-                `[${timestamp}] res.status(400).json full_nonce must 16 characters length.`,
-                missingFields
-            );
+            log(referenceId, `res.status(400).json full_nonce must be 16 characters length.`, missingFields);
             return;
         }
         // Find challenge response in DB
@@ -131,14 +127,14 @@ export async function handleChallengeResponseVerification(
             WHERE cr.full_nonce = $1`,
             [full_nonce]
         );
+
+
         if (challengeDataResult.rowCount === 0) {
             res.status(401).json({
                 error_message: "unauthenticated",
                 error_code: "40100003"
             });
-            console.error(
-                `[${timestamp}] res.status(401).json: { error: "Challenge not valid", message: "The challenge provided is not valid. Please ensure that the full_nonce is correct." }`
-            );
+            log(referenceId, `res.status(401).json: { error: "Challenge not valid", message: "The challenge provided is not valid. Please ensure that the full_nonce is correct." }`);
             return;
         }
 
@@ -148,16 +144,13 @@ export async function handleChallengeResponseVerification(
 
         // Check if the timestamp is within the last 60 seconds
         if (currentTime - challengeTimestamp > BigInt(60)) {
-            console.log("\n ------Challenge response exceeds 60 seconds, deleting challenge reponse")
+            log(referenceId, "\n ------Challenge response exceeds 60 seconds, deleting challenge response");
             res.status(401).json({
                 error_message: "unauthenticated",
                 error_code: "40100004"
             });
             await deleteChallengeResponse(full_nonce);
-            console.error(
-                `[${timestamp}] res.status(401).json: { message: "Challenge has expired" }`,
-                ` \nrequest sent: ${JSON.stringify(req.body)}`
-            );
+            log(referenceId, `res.status(401).json: { message: "Challenge has expired" }`, `\nrequest sent: ${JSON.stringify(req.body)}`);
             return;
         }
         // Verify challenge response
@@ -166,38 +159,29 @@ export async function handleChallengeResponseVerification(
             challengeData.saltedpassword
         );
         const isValid = expectedChallengeResponse === challenge_response;
-        console.log("expected Challenge Response: ", expectedChallengeResponse);
-        console.log(
-            "compared challenge response: ",
-            challenge_response,
-            "\n -------------"
-        );
+        log(referenceId, "Expected Challenge Response:", expectedChallengeResponse);
+        log(referenceId, "Compared challenge response:", challenge_response);
 
 
         // Cek if challenge response is valid
         if (isValid) {
-            // Generate session id - 16 random alphanumeric lowercase characters
             const session_id = generateRandomString(16);
-            // Generate nonce2 = 8 random alphanumeric lowercase characters
             const nonce2 = generateRandomString(8);
-            // session secret = hmac-sha256(key=salted password, message = full nonce + nonce2)
             const session_secret = createHMACSHA256HashHex(
                 `${full_nonce}${nonce2}`,
                 challengeData.saltedpassword
             );
 
-            console.log("   Challenge response valid");
-            console.log("[Valid Challenge Response: ", expectedChallengeResponse, "]");
-            console.log(`Generate session ID and nonce2:`);
-            console.log(`[  session_id: ${session_id} ]`);
-            console.log(`[  nonce2: ${nonce2} ]`);
-            console.log(`[  session_secret: ${session_secret}]`);
+            log(referenceId, "   Challenge response valid");
+            log(referenceId, `[ Valid Challenge Response:", ${expectedChallengeResponse},]`);
+            log(referenceId, "Generate session ID and nonce2:");
+            log(referenceId, `[  session_id: ${session_id} ]`);
+            log(referenceId, `[  nonce2: ${nonce2} ]`);
+            log(referenceId, `[  session_secret: ${session_secret}]`);
 
-            // Do upsert query
             await upsertSession(session_id, challengeData.user_id, session_secret);
 
-            // get user pivilage
-            const privileges = await getUserPrivileges(challengeData.user_id)
+            const privileges = await getUserPrivileges(challengeData.user_id);
 
             res.status(200).json({
                 session_id,
@@ -207,31 +191,26 @@ export async function handleChallengeResponseVerification(
                     privileges,
                 },
             });
-            console.log("res.status(200).json(", JSON.stringify({
-                session_id,
-                nonce2,
-                user_data: {
-                    full_name: challengeData.full_name,
-                    privileges,
-                },
-            }), ");");
+            log(
+                referenceId,
+                `res.status(200).json(${{
+                    session_id,
+                    nonce2,
+                    user_data: { full_name: challengeData.full_name, privileges },
+                }});`
+            );
+
 
         } else {
             res.status(401).json({
                 error_message: "unauthenticated",
                 error_code: "40100005"
             });
-            console.error(
-                `[${timestamp}] res.status(401).json: { timeStamp: "${timestamp}", message: "Invalid challenge response" }`,
-                ` \nrequest sent: ${JSON.stringify(req.body)}`
-            );
+            log(referenceId, `res.status(401).json: {message: "Invalid challenge response" }`, `\nrequest sent: ${JSON.stringify(req.body)}`);
         }
         await deleteChallengeResponse(full_nonce);
     } catch (e) {
         res.status(500).json({ error_code: "50000001", error_message: "Internal server Error" });
-        console.error(
-            `[${timestamp}] Error during verifying challenge response: { error: "internal server error", details: "${e}" }`,
-            ` \nrequest sent: ${JSON.stringify(req.body)}`
-        );
+        log(referenceId, `Error during verifying challenge response: { error: "internal server error", details: "${e}" }`, `\nrequest sent: ${JSON.stringify(req.body)}`);
     }
 }

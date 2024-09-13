@@ -1,23 +1,33 @@
 import { Request, Response, NextFunction } from 'express';
-import generateTimestamp from '../utils/generateTimeStamp';
+import { globalVar } from '../utils/globalVar';
 
+import generateRandomString from '../utils/generateRandomString';
+import log from '../utils/logHelper';
 
-export default function logRequestMiddleware(req: Request, res: Response, next: NextFunction) {
-    const timestamp = generateTimestamp();
+// Generate a unique reference ID for each request
+
+const logRequestMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    let referenceId = generateRandomString(6); 
+
+    globalVar.setReferenceId(referenceId);
+
     const { method, url, headers, body } = req;
     const ipAddress = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    console.log('\n', '------------------------------------------');
-    console.log(`[${timestamp}] Incoming request from IP: ${ipAddress}`);
-    console.log(`Received ${method} request to url: ${url}`);
-    console.log('Headers:', headers);
+
+    console.log("\n-----------------------------------------")
+    log(globalVar.getReferenceId(), 'INCOMING REQUEST FROM IP ADDRESS:', ipAddress);
+    log(globalVar.getReferenceId(), `Received ${method} request to url: ${url}`);
+    log(globalVar.getReferenceId(), 'Headers:', headers);
+
     if (headers['content-type'] === 'application/json') {
-        console.log('Body (JSON):', body);
+        log(globalVar.getReferenceId(), 'Body (JSON):', body);
     } else if (headers['content-type'] === 'application/x-www-form-urlencoded') {
-        console.log('Body (URL Encoded):', body);
+        log(globalVar.getReferenceId(), 'Body (URL Encoded):', body);
     } else {
-        console.log('Body (Other):', body);
+        log(globalVar.getReferenceId(), 'Body (Other):', body);
     }
-    console.log('------------------------------------------');
 
     next();
 };
+
+export default logRequestMiddleware;

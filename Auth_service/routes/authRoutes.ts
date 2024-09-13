@@ -1,7 +1,7 @@
 //routes/AuthRoutes.ts
 import { Router } from 'express';
 import { handleLoginRequest } from '../controllers/loginController';
-import { handleChallengeResponseVerification } from '../controllers/verifyController';
+import { handleChallengeResponseVerification } from '../controllers/verifyChallengeResponseController';
 
 
 const router = Router();

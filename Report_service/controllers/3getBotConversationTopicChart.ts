@@ -1,21 +1,40 @@
 import { Request, Response } from 'express';
 import dotenv from 'dotenv'
-import generateTimestamp from '../utils/generateTimeStamp'
 import validateRequestHash from "../utils/validateRequestHash";
 import checkBotOrganization from "../utils/checkBotOrganization";
+import log from '../utils/logHelper';
+import { globalVar } from '../utils/globalVar';
 
 dotenv.config();
 export const getBotConversationTopicChart = async (req: Request, res: Response) => {
-    console.log("execute method: getBotConversationTopicChart");
-    const timeStamp = generateTimestamp();
+    let  referenceId = globalVar.getReferenceId() || 'undefined';
+    log(referenceId, "Executing method: getBotConversationTopicChart");
+
+
     const realBackendURL = process.env.endpoint3 ?? "";
-    console.log(`Real backend URL: ${realBackendURL}`);
+
+    if (!realBackendURL) {
+        res.status(500).json({
+            error_code: "5000011",
+            error_message: "internal server error",
+        });
+        log(referenceId, `Response sent: res.status(500).json({ error_code: "internal server error", message: "Backend URL is not defined" });`);
+        return;
+    }
 
     const postBody = req.body;
     const botId = postBody.data?.bot_id;
     const sessionId = req.headers['ecwx-session-id'] as string;
     const hash = req.headers['ecwx-hash'] as string;
 
+    if (!botId) {
+        res.status(400).json({
+            error_message: "invalid request. invalid field value",
+            error_code: "40000051",
+        });
+        log(referenceId, "Bot ID not found in request body");
+        return;
+    }
     // Validate request hash
     const validationResult = await validateRequestHash(req, botId, sessionId, hash);
 
@@ -25,14 +44,14 @@ export const getBotConversationTopicChart = async (req: Request, res: Response) 
             error_message: "unauthenticated",
             error_code: "40100031"
         });
-        console.error(`[${timeStamp}] Hash validation failed`);
+        log(referenceId, `Response sent: res.status(500).json({ error_code: "internal server error", message: "Backend URL is not defined" });`);
         return;
     }
 
     const { userId, organizationId } = validationResult;
-    console.log(`Bot ID received: ${botId}`);
-    console.log(`User ID from session data: ${userId}`);
-    console.log(`Organization ID from session data: ${organizationId}`);
+    log(referenceId, `Bot ID received: ${botId}`);
+    log(referenceId, `User ID from session data: ${userId}`);
+    log(referenceId, `Organization ID from session data: ${organizationId}`);
 
     // Check if the bot organization is valid
     const isOrganization = await checkBotOrganization(botId, userId, organizationId);
@@ -41,12 +60,12 @@ export const getBotConversationTopicChart = async (req: Request, res: Response) 
             error_code: "4030031",
             error_message: "forbidden",
         });
-        console.error(`[${timeStamp}] Response sent: res.status(403).json({ error_code: "forbidden", message: "Bot ID does not match organization ID" });`);
+        log(referenceId, `Response sent: res.status(403).json({ error_code: "forbidden", message: "Bot ID does not match organization ID" });`);
         return;
     }
 
-    console.log('Hash is valid');
-    console.log(`[${timeStamp}] Continuing request to real backend URL: ${realBackendURL}`);
+    log(referenceId, 'Hash is valid');
+    log(referenceId, `Continuing request to real backend URL: ${realBackendURL}`);
     try {
         // Send request to the real backend
         const backendResponse = await fetch(realBackendURL, {
@@ -59,20 +78,21 @@ export const getBotConversationTopicChart = async (req: Request, res: Response) 
             body: JSON.stringify(req.body),
         });
 
-        console.log(`Post body sent to real backend: ${JSON.stringify(req.body)}`);
+        log(referenceId, `Post body sent to real backend: ${JSON.stringify(req.body)}`);
 
         const responseData = await backendResponse.json();
         const realBackendResStatus = backendResponse.status;
 
         res.status(realBackendResStatus).json(responseData);
-        console.log(`Response from real backend: res.status(${realBackendResStatus}).json(${JSON.stringify(responseData)});`);
-        console.log("Send Real Backand Status to FE", realBackendResStatus, "Response Data", responseData);
+        log(referenceId, `Response from real backend: res.status(${realBackendResStatus}).json(${JSON.stringify(responseData)});`);
+        log(referenceId, "Send Real Backend Status to FE", ` ${realBackendResStatus}, Response Data:  ${JSON.stringify(responseData)}`);
     } catch (e) {
-        console.error(`[${timeStamp}] Error forwarding request to backend: ${e}`);
+
         res.status(500).json({
             error_code: "5000031",
-            error_message: "error, internal server error",
+            error_message: "internal server error",
         });
+        log(referenceId, `Error forwarding request to backend: ${e}`);
     }
 }
 
