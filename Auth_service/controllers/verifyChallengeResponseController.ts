@@ -59,6 +59,45 @@ async function getUserPrivileges(userId: number): Promise<string> {
 }
 
 
+async function getOrganizationTier(userId: number): Promise<string> {
+    const referenceId = globalVar.getReferenceId() || 'undefined';
+    log(referenceId, "Executing method: getOrganizationTier");
+
+    try {
+        // Query untuk mengambil organization_id dari tabel servouser.user
+        const getOrgIdQuery = 'SELECT organization_id FROM servouser.user WHERE id = $1 LIMIT 1';
+        log(referenceId, "Get organization ID query:", getOrgIdQuery);
+
+        const orgIdResult = await pool.query(getOrgIdQuery, [userId]);
+        if (orgIdResult.rows.length === 0) {
+            log(referenceId, "No organization_id found for user ID:", userId);
+            return "0";
+        }
+
+        const organizationId = orgIdResult.rows[0].organization_id;
+        log(referenceId, "User ID:", userId);
+        log(referenceId, "Organization ID from servouser.user:", organizationId);
+
+        // Query untuk mengambil tier dari tabel servouser.organization berdasarkan organization_id
+        const getOrganizationTierQuery = 'SELECT tier FROM servouser.organization WHERE id = $1 LIMIT 1';
+        log(referenceId, "Get organization tier query:", getOrganizationTierQuery);
+
+        const tierResult = await pool.query(getOrganizationTierQuery, [organizationId]);
+        if (tierResult.rows.length === 0) {
+            log(referenceId, "No tier found for organization_id:", organizationId);
+            return "0";
+        }
+
+        const tier = tierResult.rows[0].tier;
+        log(referenceId, "Organization tier from servouser.organization:", tier);
+
+        return tier;
+    } catch (error) {
+        log(referenceId, "Error retrieving organization tier:", error);
+        return "0";
+    }
+}
+
 async function upsertSession(session_id: string, user_id: string, session_secret: string) {
     console.log("Executing method: upsertSession");
 
@@ -183,21 +222,30 @@ export async function handleChallengeResponseVerification(
 
             const privileges = await getUserPrivileges(challengeData.user_id);
 
+            const tier = await getOrganizationTier(challengeData.user_id);
+
             res.status(200).json({
                 session_id,
                 nonce2,
                 user_data: {
                     full_name: challengeData.full_name,
                     privileges,
+                    tier
                 },
             });
+
             log(
+                
                 referenceId,
-                `res.status(200).json(${{
+                `\n Continuing Response Real Backend to FEres.status(200).json(${JSON.stringify({
                     session_id,
                     nonce2,
-                    user_data: { full_name: challengeData.full_name, privileges },
-                }});`
+                    user_data: {
+                        full_name: challengeData.full_name,
+                        privileges,
+                        tier
+                    }
+                })});  \n`
             );
 
 
