@@ -21,7 +21,7 @@ app.get('/', async (req, res) => {
     const client = await pool.connect();
     try {
         await client.query('SELECT NOW()');
-        res.send('request received');
+        res.send('Request received');
         console.error(' Connected to database');
     } catch (e) {
         console.error('Cannot connect to database:', e);

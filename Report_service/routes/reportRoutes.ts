@@ -6,8 +6,8 @@ import { getBotConversation } from "../controllers/4getBotConversation";
 import { getBotInternalKnowledge } from "../controllers/5getBotInternalKnowledge"
 import { updateBotInternalKnowledge } from "../controllers/6updateBotInternalKnowledge"
 import { getBotInternalGreeting } from "../controllers/7getBotInternalGreeting"
-import { updateBotInternalGreeting } from "../controllers/8updateBotInternalGreeting"
-
+import { updateBotInternalGreeting } from "../controllers/8updateBotInternalGreeting copy"
+import { getVoiceConfigOptions} from "../controllers/9getVoiceConfigOptions"
 
 const router = Router();
 //1
@@ -87,7 +87,7 @@ router.post('/get_bot_internal_greeting', getBotInternalGreeting)
 router.post('/update_bot_internal_greeting', updateBotInternalGreeting)
 
 //9
-router.post('/-', )
+router.post('/get_voice_config_options', getVoiceConfigOptions)
 
 
 

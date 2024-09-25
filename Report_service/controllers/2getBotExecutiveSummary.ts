@@ -18,7 +18,7 @@ export const getBotExecutiveSummary = async (req: Request, res: Response) => {
             error_code: "5000011",
             error_message: "internal server error",
         });
-        log(referenceId, " Response sent: ", ` res.status(500).json({ error_code: "internal server error", message: "Backend URL is not defined" });`);
+        log(referenceId, " Response sent: ", ` res.status(500).json({ error_code: "internal server error", message: "Real Backend URL is not defined" });`);
         return;
     }
 

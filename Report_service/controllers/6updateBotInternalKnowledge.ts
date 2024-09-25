@@ -17,7 +17,7 @@ export const updateBotInternalKnowledge = async (req: Request, res: Response) =>
             error_code: "5000011",
             error_message: "internal server error",
         });
-        log(referenceId, `Response sent: res.status(500).json({ error_code: "internal server error", message: "Backend URL is not defined" });`);
+        log(referenceId, `Response sent: res.status(500).json({ error_code: "internal server error", message: "Real Backend URL is not defined" });`);
         return;
     }
     const botId = req.body?.bot_id;

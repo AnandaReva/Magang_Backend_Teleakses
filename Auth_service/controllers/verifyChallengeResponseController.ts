@@ -10,7 +10,7 @@ import pool from '../db/config'
 async function deleteChallengeResponse(full_nonce: string): Promise<void> {
     const referenceId = globalVar.getReferenceId() || 'undefined';
     try {
-        log(referenceId, "Executing method: deleteChallengeResponse");
+        log(referenceId, "\n Executing method: deleteChallengeResponse");
         log(referenceId, "Full nonce:", full_nonce);
         const deleteQuery = "DELETE FROM servouser.challenge_response WHERE full_nonce = $1 RETURNING *";
         log(referenceId, "Delete Challenge Response Query:", deleteQuery);
@@ -28,7 +28,7 @@ async function deleteChallengeResponse(full_nonce: string): Promise<void> {
 
 async function getUserPrivileges(userId: number): Promise<string> {
     const referenceId = globalVar.getReferenceId() || 'undefined';
-    log(referenceId, "Executing method: getUserPrivileges");
+    log(referenceId, "\n Executing method: getUserPrivileges");
     try {
         const getRoleQuery = 'SELECT role FROM servouser.user WHERE id = $1 LIMIT 1';
         log(referenceId, "Get role query:", getRoleQuery);
@@ -61,7 +61,7 @@ async function getUserPrivileges(userId: number): Promise<string> {
 
 async function getOrganizationTier(userId: number): Promise<string> {
     const referenceId = globalVar.getReferenceId() || 'undefined';
-    log(referenceId, "Executing method: getOrganizationTier");
+    log(referenceId, "\n Executing method: getOrganizationTier");
 
     try {
         // Query untuk mengambil organization_id dari tabel servouser.user
@@ -99,7 +99,7 @@ async function getOrganizationTier(userId: number): Promise<string> {
 }
 
 async function upsertSession(session_id: string, user_id: string, session_secret: string) {
-    console.log("Executing method: upsertSession");
+    console.log("\n Executing method: upsertSession");
 
     const queryUpsertSession = `
         INSERT INTO servouser.session (session_id, user_id, session_secret, tstamp, st)
@@ -131,7 +131,7 @@ export async function handleChallengeResponseVerification(
     res: Response
 ): Promise<void> {
     const referenceId = globalVar.getReferenceId() || 'undefined';
-    log(referenceId, "Execute method: handleChallengeResponseVerification");
+    log(referenceId, "\n Execute method: handleChallengeResponseVerification");
     log(referenceId, `Request Body: ${JSON.stringify(req.body)}`);
 
     try {
@@ -166,6 +166,9 @@ export async function handleChallengeResponseVerification(
             WHERE cr.full_nonce = $1`,
             [full_nonce]
         );
+
+
+
 
 
         if (challengeDataResult.rowCount === 0) {

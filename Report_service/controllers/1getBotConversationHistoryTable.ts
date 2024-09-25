@@ -18,7 +18,7 @@ export const getBotConversationHistoryTable = async (req: Request, res: Response
             error_code: "5000011",
             error_message: "internal server error",
         });
-        log(referenceId, ` Response sent: res.status(500).json({ error_code: "internal server error", message: "Backend URL is not defined" });`);
+        log(referenceId, ` Response sent: res.status(500).json({ error_code: "internal server error", message: "Real Backend URL is not defined" });`);
         return;
     }
 
@@ -69,6 +69,7 @@ export const getBotConversationHistoryTable = async (req: Request, res: Response
     log(referenceId, 'Hash is valid');
     log(referenceId, `Continuing request to real backend URL: ${realBackendURL}`);
 
+    /// pisah dari sini
     try {
         // Send request to the real backend
         const backendResponse = await fetch(realBackendURL, {

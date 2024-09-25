@@ -11,3 +11,5 @@ Progress:
 - Fix error message
 - Add bot_id and id organization validation
 - 4 new bot Internal endpoints
+- Log Helper function
+- 1 new Voice Configuration endpoint

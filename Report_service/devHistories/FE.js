@@ -2,21 +2,21 @@ const CryptoJS = require('crypto-js');
 
 
 //const session_secret = 'gOFhhf39yBnWdtBVZc2LAsHnFonLFUaFD92CUhonvrg='; 
-const session_secret = '01912193a7f77835841d6bad9f758da8da96a45d136153e75364c04c52a9b04f';
+const session_secret = '2eb298e418a239365c247b2f5921a4b39c872e413091766e634a309b02cb30dd';
 //api 1
-// const parameters = {
-//     data: {
-//         row_length: 0,
-//         page: 0,
-//         sort_column: 0,
-//         direction: "desc",
-//         bot_id: "1"
-//     },
-//     from_date: 0,
-//     to_date: 0,
-//     search_filter: "string",
-//     date_mode: 0
-// };
+const parameters = {
+    data: {
+        row_length: 0,
+        page: 0,
+        sort_column: 0,
+        direction: "desc",
+        bot_id: "1"
+    },
+    from_date: 0,
+    to_date: 0,
+    search_filter: "string",
+    date_mode: 0
+};
 
 //api 2
 /* const parameters = {
@@ -54,12 +54,12 @@ const session_secret = '01912193a7f77835841d6bad9f758da8da96a45d136153e75364c04c
  */
 
 //api6
-const parameters = {
+/* const parameters = {
     bot_id: "1",
     child_prompt_id: "",
     knowledge_text: "",
     classification_name: ""
-};
+}; */
 
 //api 7
 /* const parameters = {
@@ -72,6 +72,12 @@ const parameters = {
 //     bot_id: "1",
 //     greeting: "",
 //     topics: ""
+// };
+
+
+//api 9
+// const parameters = {
+//     bot_id: "1"
 // };
 
 

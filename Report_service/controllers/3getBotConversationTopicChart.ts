@@ -18,7 +18,7 @@ export const getBotConversationTopicChart = async (req: Request, res: Response) 
             error_code: "5000011",
             error_message: "internal server error",
         });
-        log(referenceId, `Response sent: res.status(500).json({ error_code: "internal server error", message: "Backend URL is not defined" });`);
+        log(referenceId, `Response sent: res.status(500).json({ error_code: "internal server error", message: "Real Backend URL is not defined" });`);
         return;
     }
 
@@ -44,7 +44,7 @@ export const getBotConversationTopicChart = async (req: Request, res: Response) 
             error_message: "unauthenticated",
             error_code: "40100031"
         });
-        log(referenceId, `Response sent: res.status(500).json({ error_code: "internal server error", message: "Backend URL is not defined" });`);
+        log(referenceId, `Response sent: res.status(500).json({ error_code: "internal server error", message: "Bot ID does not match organization ID" });`);
         return;
     }
 

@@ -42,7 +42,7 @@ export const getBotConversation = async (req: Request, res: Response) => {
             error_code: "5000002",
             error_message: "internal server error",
         });
-        log(referenceId, `referenceId Backend URL is not defined`);
+        log(referenceId, `referenceId Real Backend URL is not defined`);
         return;
     }
 

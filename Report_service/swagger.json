@@ -1021,6 +1021,148 @@
           }
         ]
       }
+    },
+    "/get_voice_config_options": {
+      "post": {
+        "tags": [
+          "Voice Configuration"
+        ],
+        "summary": "9. Get Voice Configuration Options",
+        "description": "Handles requests to fetch the voice configuration options, validates the request hash, checks the bot organization, and forwards the request to the actual backend endpoint.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "bot_id": {
+                    "type": "string",
+                    "description": "The ID of the bot for which the voice configuration options are being requested."
+                  }
+                },
+                "required": [
+                  "bot_id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with voice configuration options.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Contains the voice configuration options."
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Success message."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing or invalid bot ID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error_message": {
+                      "type": "string",
+                      "description": "Error message indicating invalid request data."
+                    },
+                    "error_code": {
+                      "type": "string",
+                      "description": "Error code for bad request."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Hash validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error_message": {
+                      "type": "string",
+                      "description": "Error message indicating hash validation failed."
+                    },
+                    "error_code": {
+                      "type": "string",
+                      "description": "Error code for unauthorized access."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Bot ID does not match the organization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error_code": {
+                      "type": "string",
+                      "description": "Error code indicating forbidden access."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error_code": {
+                      "type": "string",
+                      "description": "Error message indicating a server issue or failure to communicate with the backend."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ecwx-session-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Session ID used for tracking the session."
+          },
+          {
+            "name": "ecwx-hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "HMAC-SHA256 hash of the request body using the session secret."
+          }
+        ]
+      }
     }
   }
 }
