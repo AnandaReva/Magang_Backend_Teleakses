@@ -1,18 +1,17 @@
 import { Request, Response } from 'express';
 import dotenv from 'dotenv';
-
 import validateRequestHash from "../utils/validateRequestHash";
 import checkBotOrganization from "../utils/checkBotOrganization";
 import log from '../utils/logHelper';
 import { globalVar } from '../utils/globalVar';
-
 dotenv.config();
 
-export const getBotInternalKnowledge = async (req: Request, res: Response) => {
+export const uploadOutbound = async (req: Request, res: Response) => {
     let referenceId = globalVar.getReferenceId() || 'undefined';
 
-    log(referenceId, "Executing method: getBotInternalKnowledge");
-    const realBackendURL = process.env.endpoint5 ?? '';
+    log(referenceId, "Executing method: uploadOutbound");
+
+    const realBackendURL = process.env.endpoint10 ?? '';
 
     if (!realBackendURL) {
         res.status(500).json({
@@ -27,6 +26,7 @@ export const getBotInternalKnowledge = async (req: Request, res: Response) => {
     const botId = req.body?.bot_id;
     const sessionId = req.headers['ecwx-session-id'] as string;
     const hash = req.headers['ecwx-hash'] as string;
+
     if (!botId) {
         res.status(400).json({
             error_message: "invalid request",
@@ -36,11 +36,14 @@ export const getBotInternalKnowledge = async (req: Request, res: Response) => {
         log(referenceId, `Response sent: res.status(400).json({ error_code: "40000001", message: "invalid request" });`);
         return;
     }
-    
-   //Prepare post body from FE
-   const postBodyFromFe = req.body;
-   // Validate request hash
-   const validationResult = await validateRequestHash(botId, sessionId, hash, postBodyFromFe);
+
+    //Prepare post body from FE
+    const postBodyFromFe = req.body;
+    log(referenceId, `Post body from FE: ${JSON.stringify(postBodyFromFe)}`);
+
+    // Validate request hash
+    log(referenceId, `Validating request hash for botId: ${botId}, sessionId: ${sessionId}`);
+    const validationResult = await validateRequestHash(botId, sessionId, hash, postBodyFromFe);
 
     // Check if validation failed
     if (!validationResult) {
@@ -59,6 +62,7 @@ export const getBotInternalKnowledge = async (req: Request, res: Response) => {
     log(referenceId, `Organization ID from session data: ${organizationId}`);
 
     // Check if the bot organization is valid
+    log(referenceId, `Checking bot organization for botId: ${botId}`);
     const isOrganization = await checkBotOrganization(botId, userId, organizationId);
     if (!isOrganization) {
         res.status(403).json({
@@ -74,7 +78,7 @@ export const getBotInternalKnowledge = async (req: Request, res: Response) => {
     log(referenceId, `Continuing request to real backend URL: ${realBackendURL}`);
 
     try {
-        // Send request to the real backend
+        log(referenceId, `Sending request to backend with body: ${JSON.stringify(req.body)}`);
         const backendResponse = await fetch(realBackendURL, {
             method: 'POST',
             headers: {
@@ -85,13 +89,23 @@ export const getBotInternalKnowledge = async (req: Request, res: Response) => {
             body: JSON.stringify(req.body),
         });
 
-        log(referenceId, `Post body sent to real backend: ${JSON.stringify(req.body)}`);
-        const responseData = await backendResponse.json();
+        log(referenceId, `Request sent to backend, status: ${backendResponse.status}`);
+
+        const responseText = await backendResponse.text();
+        log(referenceId, `Response text from backend: ${responseText}`);
+
+        let responseData;
+        try {
+            responseData = JSON.parse(responseText);
+        } catch (parseError) {
+            log(referenceId, `Error parsing response from backend: ${parseError}`);
+            throw new SyntaxError(`Invalid JSON response from backend: ${responseText}`);
+        }
+
         const realBackendResStatus = backendResponse.status;
         res.status(realBackendResStatus).json(responseData);
 
         log(referenceId, `Response from real backend: res.status(${realBackendResStatus}).json(${JSON.stringify(responseData)});`);
-        log(globalVar.getReferenceId(), "Send Real Backend response to FE", `status: ${realBackendResStatus} Response Data:, ${JSON.stringify(responseData)}`);
     } catch (e) {
         res.status(500).json({
             error_code: "5000002",

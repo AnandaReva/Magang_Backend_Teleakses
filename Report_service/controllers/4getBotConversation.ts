@@ -42,7 +42,8 @@ export const getBotConversation = async (req: Request, res: Response) => {
             error_code: "5000002",
             error_message: "internal server error",
         });
-        log(referenceId, `referenceId Real Backend URL is not defined`);
+        log(referenceId, "Real Backend URL is not defined");
+        log(referenceId, ` Response sent: res.status(500).json({ error_code: "5000001", message: "internal server error" });`);
         return;
     }
 
@@ -54,7 +55,7 @@ export const getBotConversation = async (req: Request, res: Response) => {
 
     if (!sessionId) {
         res.status(400).json({
-            error_message: "invalid request. invalid field value",
+            error_message: "invalid request",
             error_code: "40000004",
         });
         log(referenceId, `Session ID not provided`);
@@ -62,7 +63,7 @@ export const getBotConversation = async (req: Request, res: Response) => {
     }
     if (!job_id) {
         res.status(400).json({
-            error_message: "invalid request. invalid field value",
+            error_message: "invalid request",
             error_code: "40000004",
         });
         log(referenceId, `Job ID not provided`);
@@ -118,9 +119,10 @@ export const getBotConversation = async (req: Request, res: Response) => {
 
     } catch (e) {
         res.status(500).json({
-            error_code: "5000041",
+            error_code: "5000002",
             error_message: "internal server error",
         });
-        log(referenceId, ` Error forwarding request to backend: ${e}`);
+        log(referenceId, `Error forwarding request to backend: ${e}`);
+        log(referenceId, `Response sent: res.status(500).json({ error_code: "5000002", message: "internal server error" });`);
     }
 };

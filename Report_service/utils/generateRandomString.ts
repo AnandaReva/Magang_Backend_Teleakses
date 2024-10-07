@@ -6,7 +6,7 @@ import { globalVar } from './globalVar';
 export default function generateRandomString(length: number): string {
     const referenceId = globalVar.getReferenceId();
 
-    log(referenceId, "Executing method: generateRandomString");
+    log(referenceId, "\nExecuting method: generateRandomString");
 
     const charset = "abcdefghijklmnopqrstuvwxyz0123456789";
     let result = "";

@@ -14,10 +14,11 @@ export const getBotInternalGreeting = async (req: Request, res: Response) => {
 
     if (!realBackendURL) {
         res.status(500).json({
-            error_code: "5000011",
+            error_code: "5000001",
             error_message: "internal server error",
         });
-        log(referenceId, `Response sent: res.status(500).json({ error_code: "internal server error", message: "Real Backend URL is not defined" });`);
+        log(referenceId, "Real Backend URL is not defined");
+        log(referenceId, ` Response sent: res.status(500).json({ error_code: "5000001", message: "internal server error" });`);
         return;
     }
 
@@ -28,23 +29,26 @@ export const getBotInternalGreeting = async (req: Request, res: Response) => {
 
     if (!botId) {
         res.status(400).json({
-            error_message: "invalid request. invalid field value",
+            error_message: "invalid request",
             error_code: "40000051",
         });
         log(referenceId, "Bot ID not found in request body");
         return;
     }
 
+    //Prepare post body from FE
+    const postBodyFromFe = req.body;
     // Validate request hash
-    const validationResult = await validateRequestHash(req, botId, sessionId, hash);
+    const validationResult = await validateRequestHash(botId, sessionId, hash, postBodyFromFe);
 
     // Check if validation failed
-    if (validationResult === "0") {
+    if (!validationResult) {
         res.status(401).json({
             error_message: "unauthenticated",
-            error_code: "40000052"
+            error_code: "40100001"
         });
         log(referenceId, "Hash validation failed");
+        log(referenceId, `Response sent: res.status(401).json({ error_code: "40100002", message: "unauthenticated" });`);
         return;
     }
 
@@ -58,13 +62,13 @@ export const getBotInternalGreeting = async (req: Request, res: Response) => {
     const isOrganization = await checkBotOrganization(botId, userId, organizationId);
     if (!isOrganization) {
         res.status(403).json({
-            error_code: "4030071",
+            error_code: "4030001",
             error_message: "forbidden",
         });
-        log(referenceId, "Hash validation failed");
+        log(referenceId, "Bot ID does not match organization ID");
+        log(referenceId, `Response sent: res.status(403).json({ error_code: "4030001", message: "forbidden" });`);
         return;
     }
-
     log(referenceId, 'Hash is valid');
     log(referenceId, `Continuing request to real backend URL: ${realBackendURL}`);
 
@@ -89,10 +93,11 @@ export const getBotInternalGreeting = async (req: Request, res: Response) => {
         log(referenceId, `Response from real backend: res.status(${realBackendResStatus}).json(${JSON.stringify(responseData)});`);
         log(globalVar.getReferenceId(), "Send Real Backend response to FE", `status: ${realBackendResStatus} Response Data:, ${JSON.stringify(responseData)}`);
     } catch (e) {
-        log(referenceId, `Error forwarding request to backend: ${e}`);
         res.status(500).json({
-            error_code: "5000071",
+            error_code: "5000002",
             error_message: "internal server error",
         });
+        log(referenceId, `Error forwarding request to backend: ${e}`);
+        log(referenceId, `Response sent: res.status(500).json({ error_code: "5000002", message: "internal server error" });`);
     }
 };

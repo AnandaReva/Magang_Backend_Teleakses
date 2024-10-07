@@ -12,6 +12,7 @@ async function upsertChallengeResponse(full_nonce: string, user_id: string, chal
     const referenceId = globalVar.getReferenceId() || 'undefined';
 
     log(referenceId, "\n Executing method: upsertChallengeResponse");
+    const client = await pool.connect();
 
     const upsertQuery = `
         INSERT INTO servouser.challenge_response (full_nonce, user_id, challenge_response, tstamp)
@@ -23,12 +24,14 @@ async function upsertChallengeResponse(full_nonce: string, user_id: string, chal
     `;
     log(referenceId, "upsert query for challenge response:", upsertQuery);
     try {
-        await pool.query(upsertQuery, [full_nonce, user_id, challengeResponse, currentTime]);
+        await client.query(upsertQuery, [full_nonce, user_id, challengeResponse, currentTime]);
         log(referenceId, "Challenge response upserted successfully.");
         return "success";
     } catch (upsertError) {
         log(referenceId, "Error during upsert challenge response:", upsertError);
         throw new Error("Error updating challenge response.");
+    } finally {
+        client.release();
     }
 }
 

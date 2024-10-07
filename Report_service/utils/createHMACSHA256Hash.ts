@@ -6,7 +6,7 @@ import { globalVar } from './globalVar';
 export function createHMACSHA256HashBase64(data: string, key: string): string {
     const referenceId = globalVar.getReferenceId();
 
-    log(referenceId, "Executing method: createHMACSHA256HashBase64");
+    log(referenceId, "\nExecuting method: createHMACSHA256HashBase64");
     log(referenceId, `Data:`, data);
     log(referenceId, `Key:`, key);
 
@@ -22,7 +22,7 @@ export function createHMACSHA256HashBase64(data: string, key: string): string {
 export function createHMACSHA256HashHex(data: string, key: string): string {
     const referenceId = globalVar.getReferenceId();
 
-    log(referenceId, "Executing method: createHMACSHA256HashHex");
+    log(referenceId, "\nExecuting method: createHMACSHA256HashHex");
     log(referenceId, `Data:`, data);
     log(referenceId, `Key:`, key);
 

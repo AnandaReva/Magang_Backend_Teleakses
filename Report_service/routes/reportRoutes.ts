@@ -6,8 +6,10 @@ import { getBotConversation } from "../controllers/4getBotConversation";
 import { getBotInternalKnowledge } from "../controllers/5getBotInternalKnowledge"
 import { updateBotInternalKnowledge } from "../controllers/6updateBotInternalKnowledge"
 import { getBotInternalGreeting } from "../controllers/7getBotInternalGreeting"
-import { updateBotInternalGreeting } from "../controllers/8updateBotInternalGreeting copy"
-import { getVoiceConfigOptions} from "../controllers/9getVoiceConfigOptions"
+import { updateBotInternalGreeting } from "../controllers/8updateBotInternalGreeting"
+import { getInitialData} from "../controllers/9getInitialData"
+import { uploadOutbound} from "../controllers/10uploadOutbound"
+import { coba } from "../controllers/11coba";
 
 const router = Router();
 //1
@@ -87,11 +89,12 @@ router.post('/get_bot_internal_greeting', getBotInternalGreeting)
 router.post('/update_bot_internal_greeting', updateBotInternalGreeting)
 
 //9
-router.post('/get_voice_config_options', getVoiceConfigOptions)
+router.post('/get_initial_data', getInitialData)
 
+//10
+router.post('/upload_outbound', uploadOutbound)
 
-
-
-
+//
+//router.post('/coba', coba)
 
 export default router;

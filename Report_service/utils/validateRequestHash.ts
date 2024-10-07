@@ -1,16 +1,18 @@
-import { Request } from "express";
+// utils/validateRequest.ts
 import pool from '../db/config';
 import { createHMACSHA256HashBase64 } from "./createHMACSHA256Hash";
 import log from './logHelper';
 import { globalVar } from './globalVar';
 
-
-export default async function validateRequestHash(req: Request, bot_id: string, session_id: string, hash: string): Promise<{ botId: string, organizationId: string, userId: string } | "0"> {
+export default async function validateRequestHash(
+    bot_id: string,
+    session_id: string,
+    hash: string,
+    postBody: any
+): Promise<{ botId: string, organizationId: string, userId: string } | null > {
     const referenceId = globalVar.getReferenceId();
 
-    log(referenceId, 'Executing method: validateRequestHash');
-
-
+    log(referenceId, '\nExecutign method: validateRequestHash');
     log(referenceId, "Session ID Received:", session_id);
     log(referenceId, "Hash Received:", hash);
 
@@ -18,19 +20,24 @@ export default async function validateRequestHash(req: Request, bot_id: string, 
     const missingFields: string[] = [];
     if (!session_id) missingFields.push('session_id');
     if (!hash) missingFields.push('hash');
+    if (!bot_id) missingFields.push('bot_id');
     if (missingFields.length > 0) {
-        log(referenceId, `Missing fields: ${missingFields.join(', ')}`, { requestBody: req.body });
-        return "0";
+        log(referenceId, `Missing fields: ${missingFields.join(', ')}`, { postBody });
+        return null;
     }
 
+    
     const sessionQuery = 'SELECT a.session_secret, a.user_id, b.organization_id FROM servouser.session a LEFT JOIN servouser.user b ON b.id = a.user_id WHERE a.session_id = $1 LIMIT 1';
     log(referenceId, `Query to find session data and organization id: ${sessionQuery}`);
+
+    const client = await pool.connect();
+    
     try {
 
-        const result = await pool.query(sessionQuery, [session_id]);
+        const result = await client.query(sessionQuery, [session_id]);
         if (result.rowCount === 0) {
             log(referenceId, `Session data with id = [${session_id}] not found in database`);
-            return "0";
+            return null;
         }
         log(referenceId, "Result from session and organization query:", { rowCount: result.rowCount });
 
@@ -41,9 +48,9 @@ export default async function validateRequestHash(req: Request, bot_id: string, 
         log(referenceId, `Session Secret: ${sessionSecret}`);
         log(referenceId, `User ID: ${userId}`);
         log(referenceId, `Organization ID: ${organizationId}`);
-        log(referenceId, `Post Body:`, req.body);
+        log(referenceId, `Post Body:`, postBody);
 
-        const postBodyString = JSON.stringify(req.body);
+        const postBodyString = JSON.stringify(postBody);
         const hashExpected = createHMACSHA256HashBase64(postBodyString, sessionSecret.toString());
 
         log(referenceId, "Session Secret from DB:", sessionSecret);
@@ -54,14 +61,14 @@ export default async function validateRequestHash(req: Request, bot_id: string, 
         // validate hash
         if (hash !== hashExpected) {
             console.error(`referenceId Hash validation failed. Expected: [${hashExpected}],\n Received: [${hash}]`);
-            return "0";
+            return null;
         }
 
         log(referenceId, `Bot ID from request body: ${bot_id}`);
         log(referenceId, `User ID from DB: ${userId}`);
         log(referenceId, `User ID received: ${userId}`);
 
-        //retrun data
+        // Return data
         return {
             botId: bot_id,
             organizationId: organizationId.toString(),
@@ -69,6 +76,8 @@ export default async function validateRequestHash(req: Request, bot_id: string, 
         };
     } catch (error) {
         log(referenceId, `Error while validating hash:`, error);
-        return "0";
+        return null;
+    } finally {
+        client.release();
     }
 }

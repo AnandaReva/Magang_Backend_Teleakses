@@ -13,7 +13,7 @@ export default function checkJsonMiddleware(err: any, req: Request, res: Respons
     const ipAddress = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
     // Log incoming request details
-    log(referenceId, "Executing middleware: checkJsonMiddleware");
+    log(referenceId, "\nExecuting middleware: checkJsonMiddleware");
     log(referenceId, `Incoming request from IP: ${ipAddress}`);
     log(referenceId, `Request details: curl -X ${method} ${url} \\`);
     log(referenceId, `-H "Content-Type: ${headers['content-type']}" \\`);

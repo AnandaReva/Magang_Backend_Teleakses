@@ -1,96 +1,90 @@
 const CryptoJS = require('crypto-js');
 
+const session_secret = '0613bd95be23291bbe9b9945ce84524b0c47305c0c4624e35de3d84888c9f34f';
 
-//const session_secret = 'gOFhhf39yBnWdtBVZc2LAsHnFonLFUaFD92CUhonvrg='; 
-const session_secret = '2eb298e418a239365c247b2f5921a4b39c872e413091766e634a309b02cb30dd';
-//api 1
-const parameters = {
-    data: {
-        row_length: 0,
-        page: 0,
-        sort_column: 0,
-        direction: "desc",
+const apis = [
+    //API 1
+    {
+        data: {
+            row_length: 0,
+            page: 0,
+            sort_column: 0,
+            direction: "desc",
+            bot_id: "1"
+        },
+        from_date: 0,
+        to_date: 0,
+        search_filter: "string",
+        date_mode: 0
+    },
+    //API 2
+    {
+        data: {
+            bot_id: "1"
+        },
+        from_date: 0,
+        to_date: 0,
+        date_mode: 0
+    },
+    //API 3
+    {
+        data: {
+            bot_id: "1"
+        },
+        from_date: 0,
+        to_date: 0,
+        search_filter: "string",
+        date_mode: 0
+    },
+    //API 4
+    {
+        job_id: "1725331930-c25c0600518e422c8a6ce2ee51998089"
+    },
+    //API 5
+    {
         bot_id: "1"
     },
-    from_date: 0,
-    to_date: 0,
-    search_filter: "string",
-    date_mode: 0
-};
-
-//api 2
-/* const parameters = {
-
-    data: {
+    //API 6
+    {
+        bot_id: "1",
+        child_prompt_id: "",
+        knowledge_text: "",
+        classification_name: ""
+    },
+    //API 7
+    {
         bot_id: "1"
     },
-    from_date: 0,
-    to_date: 0,
-    date_mode: 0
-
-}; */
-
-//api3
-/* const parameters = {
-    data: {
+    //API 8
+    {
+        bot_id: "1",
+        greeting: "",
+        topics: ""
+    },
+    //API 9
+    {
         bot_id: "1"
     },
-    from_date: 0,
-    to_date: 0,
-    search_filter: "string",
-    date_mode: 0
-};
- */
-//api4
+    // API 10
+    {
+        bot_id: "7",
+        file: "cGhvbmUsbmFtYSx0YWdpaGFuLGphdHVodGVtcG8KMDgxMjM3NjE1MTU4LEpva28sNzUwMDAsOCBTZXB0ZW1iZXIgMjAyNAo=",
+        filename: "test call salesbot telemarketing.csv"
+    },
+    // API 11
+    {
+        bot_id: "7"
+    }
 
-/* const parameters = {
-    job_id: "1725331930-c25c0600518e422c8a6ce2ee51998089"
-}; */
+];
 
-//api5
-/* const parameters = {
-    bot_id: "1"
-};
- */
-
-//api6
-/* const parameters = {
-    bot_id: "1",
-    child_prompt_id: "",
-    knowledge_text: "",
-    classification_name: ""
-}; */
-
-//api 7
-/* const parameters = {
-    bot_id: "1"
-}; */
-
-
-//api 8
-// const parameters = {
-//     bot_id: "1",
-//     greeting: "",
-//     topics: ""
-// };
-
-
-//api 9
-// const parameters = {
-//     bot_id: "1"
-// };
-
-
-console.log('Parameters:', parameters);
-
-
-const parameters_json = JSON.stringify(parameters);
-console.log("Serialized Parameters:", parameters_json);
-console.log("Session Secret:", session_secret);
-
-
-const hashed_body = generateHmac(parameters_json, session_secret, "parameters_json");
-
+apis.forEach((parameters, index) => {
+    const parameters_json = JSON.stringify(parameters);
+    console.log(`--------------------\nAPI ${index + 1} Parameters:`, parameters);
+    console.log(`Serialized API ${index + 1} Parameters:`, parameters_json);
+    const hashed_body = generateHmac(parameters_json, session_secret, `API ${index + 1} Parameters`);
+    console.log(`Hashed API ${index + 1} Body:`, hashed_body);
+});
 
 function generateHmac(message, key, notif) {
     console.log("Start hashing", notif, "!!");
@@ -106,4 +100,3 @@ function generateHmac(message, key, notif) {
         return null;
     }
 }
-console.log("Hashed Body:", hashed_body);

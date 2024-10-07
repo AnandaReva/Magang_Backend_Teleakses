@@ -1,16 +1,20 @@
+// utils/checkBotOrganization.ts
 import pool from '../db/config';
 import log from './logHelper';
 import { globalVar } from './globalVar';
 
 export default async function checkBotOrganization(botId: string, userId: string, organizationId: string): Promise<boolean> {
     let referenceId = globalVar.getReferenceId() || 'undefined';
-    
-    log(referenceId, 'Executing method: checkBotOrganization');;
+
+    log(referenceId, '\nExecuting method: checkBotOrganization');
+
+    const query = 'SELECT id, organization_id FROM servobot2.main_prompt WHERE id = $1 AND organization_id = $2';
+    log(referenceId, "Query to find bot id and organization:", query);
+
+    const client = await pool.connect();
 
     try {
-        const query = 'SELECT id, organization_id FROM servobot2.main_prompt WHERE id = $1 AND organization_id = $2';
-        log(referenceId, "Query to find bot id and organization:", query);
-        const result = await pool.query(query, [botId, organizationId]);
+        const result = await client.query(query, [botId, organizationId]);
         log(referenceId, `Query result:`, result.rows);
 
         if (result.rowCount === 0) {
@@ -28,5 +32,7 @@ export default async function checkBotOrganization(botId: string, userId: string
     } catch (error) {
         log(referenceId, `Error in checkBotOrganization:`, error);
         return false;
+    } finally {
+        client.release();
     }
 }
